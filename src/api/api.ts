@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { TripData } from './types';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: "/api",
   headers: {
     'Content-Type': 'application/json',
   },
@@ -52,5 +52,11 @@ export const registerUser = (data: RegisterData) =>
 export const getTrips = () => API.get<TripData[]>('/trips');
 export const createTrip = (data: TripData) => API.post('/trips', data);
 export const getTripById = (id: number) => API.get<TripData>(`/trips/${id}`);
+
+// ===== TRIPS (UPDATE/DELETE) =====
+export const updateTrip = (id: number, data: TripData) =>
+  API.put(`/trips/${id}`, data);
+
+export const deleteTrip = (id: number) => API.delete(`/trips/${id}`);
 
 export default API;

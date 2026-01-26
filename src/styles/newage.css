@@ -1,0 +1,70 @@
+:root {
+  --tc-primary: #0d6efd;
+  --tc-dark: #0b3a5b;
+  --tc-bg: #f6f7fb;
+}
+
+body {
+  background: var(--tc-bg);
+}
+
+.tc-app {
+  max-width: 430px; /* mobile look */
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-bottom: 78px; /* space for bottom nav */
+}
+
+.tc-screen {
+  padding: 16px;
+}
+
+.tc-card {
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(16, 24, 40, 0.08);
+}
+
+.tc-hero {
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(13, 110, 253, 0.92),
+    rgba(11, 58, 91, 0.92)
+  );
+  color: #fff;
+}
+
+.tc-img {
+  height: 150px;
+  border-radius: 16px;
+  background: #e9ecef;
+  background-size: cover;
+  background-position: center;
+}
+
+.tc-pill {
+  border-radius: 999px;
+}
+
+/* auth background like mockup */
+.tc-auth-bg {
+  min-height: 100vh;
+  background: linear-gradient(rgba(11, 58, 91, 0.45), rgba(11, 58, 91, 0.45)),
+    url("https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=60");
+  background-size: cover;
+  background-position: center;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.tc-auth-card {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2);
+  padding: 18px;
+}

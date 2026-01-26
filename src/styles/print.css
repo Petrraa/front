@@ -1,0 +1,22 @@
+@media print {
+  .no-print,
+  nav,
+  .navbar,
+  button,
+  .btn {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .tc-app {
+    max-width: none !important;
+    padding-bottom: 0 !important;
+  }
+
+  .tc-card {
+    box-shadow: none !important;
+  }
+}
