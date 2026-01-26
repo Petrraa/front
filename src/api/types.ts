@@ -1,10 +1,9 @@
 export interface TripData {
-  id?: number;
+  id: number;
   title: string;
-  description: string;
-  destination: string; // ✅ DODAJ
-  price: number;
-  date: string;
-  user_id?: number;
+  destination: string;
+  budget?: number | null;
+  is_public: boolean;
+  user_id: number;
   created_at?: string;
 }

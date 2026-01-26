@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { TripData } from './types';
 
 const API = axios.create({
-  baseURL: "/api",
+  baseURL: "http://127.0.0.1:8000/api",
   headers: {
     'Content-Type': 'application/json',
   },
@@ -49,14 +49,31 @@ export const registerUser = (data: RegisterData) =>
 
 // ===== TRIPS =====
 
-export const getTrips = () => API.get<TripData[]>('/trips');
+export const getTrips = () =>
+  API.get<{ trips: TripData[] }>("/trips");
 export const createTrip = (data: TripData) => API.post('/trips', data);
-export const getTripById = (id: number) => API.get<TripData>(`/trips/${id}`);
+export const getTripById = (id: number) =>
+  API.get<{ trip: TripData }>(`/trips/${id}`);
+
 
 // ===== TRIPS (UPDATE/DELETE) =====
 export const updateTrip = (id: number, data: TripData) =>
   API.put(`/trips/${id}`, data);
 
 export const deleteTrip = (id: number) => API.delete(`/trips/${id}`);
+export const logoutUser = () => API.post("/auth/logout");
+
+export const forkTrip = (tripId: number) =>
+  API.post(`/trips/${tripId}/fork`);
+
+export const getPosts = () => API.get("/posts");
+export const togglePostLike = (postId: number) =>
+  API.post(`/posts/${postId}/like`);
+
+export const shareTrip = (tripId: number) =>
+  API.post("/posts", { trip_id: tripId });
+
+export const toggleLike = (postId: number) =>
+  API.post(`/posts/${postId}/like`);
 
 export default API;

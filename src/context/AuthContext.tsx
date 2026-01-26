@@ -1,7 +1,11 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { loginUser, registerUser } from '../api/api';
-import type { RegisterData } from '../api/api';
+import { createContext, useContext, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+} from "../api/api";
+import type { RegisterData } from "../api/api";
 
 export interface User {
   id: number;
@@ -14,38 +18,44 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   login: (loginValue: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  // Restore user on refresh
+  // ✅ auto-login preko tokena
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
   const login = async (loginValue: string, password: string) => {
     const { data } = await loginUser({ login: loginValue, password });
     setUser(data.user);
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
   };
 
   const register = async (data: RegisterData) => {
     const { data: res } = await registerUser(data);
     setUser(res.user);
-    localStorage.setItem('token', res.token);
-    localStorage.setItem('user', JSON.stringify(res.user));
+    localStorage.setItem("token", res.token);
+    localStorage.setItem("user", JSON.stringify(res.user));
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch {
+      // ignore
+    } finally {
+      setUser(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
   };
 
   return (
@@ -63,8 +73,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return ctx;
 };

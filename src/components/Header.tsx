@@ -1,30 +1,25 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const Header: React.FC = () => {
+export const Header = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-      <div className="container">
-        <Link className="navbar-brand" to="/trips">TravelConnect</Link>
-        <div>
-          {user ? (
-            <>
-              <span className="me-3">Hi, {user.name}</span>
-              <button className="btn btn-outline-danger btn-sm" onClick={logout}>Logout</button>
-            </>
-          ) : (
-            <>
-              <Link className="btn btn-outline-primary me-2 btn-sm" to="/login">Login</Link>
-              <Link className="btn btn-outline-secondary btn-sm" to="/register">Register</Link>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
+    <header className="tc-header">
+      {user ? (
+        <>
+          <span>Dobrodošao, {user.name}</span>
+          <button onClick={handleLogout}>Logout</button>
+        </>
+      ) : (
+        <span>Niste prijavljeni</span>
+      )}
+    </header>
   );
 };
-
-export default Header;

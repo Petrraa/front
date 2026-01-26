@@ -1,24 +1,36 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getTrips } from "../api/api";
-import type { TripData } from "../api/types";
-import TripCard from "../components/TripCard";
+import API from "../api/api";
+
+interface Trip {
+  id: number;
+  title: string;
+  destination: string;
+  budget: number;
+  is_public: boolean;
+  user_id: number;
+}
 
 const TripsList = () => {
-  const [trips, setTrips] = useState<TripData[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const [q, setQ] = useState("");
 
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const { data } = await getTrips();
-        setTrips(Array.isArray(data) ? data : []);
+        const res = await API.get("/trips");
+
+        // ✅ OVO JE KLJUČNA LINIJA
+        // backend vraća objekt, ne array
+        const tripsData = Array.isArray(res.data)
+          ? res.data
+          : res.data.data ?? res.data.trips ?? [];
+
+        setTrips(tripsData);
       } catch (err) {
         console.error(err);
-        setError("Failed to load trips");
+        setError("Ne mogu dohvatiti putovanja");
       } finally {
         setLoading(false);
       }
@@ -27,58 +39,37 @@ const TripsList = () => {
     fetchTrips();
   }, []);
 
-  const filtered = useMemo(() => {
-    const query = q.trim().toLowerCase();
-    if (!query) return trips;
-    return trips.filter((t) => {
-      return (
-        t.title.toLowerCase().includes(query) ||
-        t.description.toLowerCase().includes(query)
-      );
-    });
-  }, [q, trips]);
+  if (loading) return <p>Učitavanje...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <div className="tc-screen">
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <div>
-          <div className="text-muted" style={{ fontSize: 12 }}>
-            Explore
-          </div>
-          <h5 className="mb-0">All Trips</h5>
-        </div>
-
-        <Link to="/trips/create" className="btn btn-primary btn-sm tc-pill">
-          + New
+    <div className="container mt-3">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4>Moja putovanja</h4>
+        <Link to="/trips/create" className="btn btn-primary">
+          + Novo putovanje
         </Link>
       </div>
 
-      <div className="input-group mb-3">
-        <span className="input-group-text tc-pill">
-          <i className="bi bi-search" />
-        </span>
-        <input
-          className="form-control tc-pill"
-          placeholder="Search trips..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-      </div>
+      {trips.length === 0 && <p>Nema putovanja</p>}
 
-      {loading && <div className="text-muted">Loading trips…</div>}
-      {error && <div className="alert alert-danger py-2">{error}</div>}
-
-      {!loading && !error && filtered.length === 0 && (
-        <div className="text-muted">No trips found.</div>
-      )}
-
-      <div className="row g-3">
-        {filtered.map((trip) => (
-          <div key={trip.id} className="col-12">
-            <TripCard trip={trip} />
+      {trips.map((trip) => (
+        <Link
+          key={trip.id}
+          to={`/trips/${trip.id}`}
+          className="card mb-2 text-decoration-none text-dark"
+        >
+          <div className="card-body">
+            <h5 className="card-title">{trip.title}</h5>
+            <p className="card-text">
+              📍 {trip.destination} | 💰 {trip.budget} €
+              {trip.is_public && (
+                <span className="badge bg-success ms-2">Public</span>
+              )}
+            </p>
           </div>
-        ))}
-      </div>
+        </Link>
+      ))}
     </div>
   );
 };
