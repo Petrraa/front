@@ -1,75 +1,47 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import API from "../api/api";
-
-interface Trip {
-  id: number;
-  title: string;
-  destination: string;
-  budget: number;
-  is_public: boolean;
-  user_id: number;
-}
+import { getTrips } from "../api/api";
+import { useAuth } from "../context/AuthContext";
+import TripCard from "../components/TripCard";
 
 const TripsList = () => {
-  const [trips, setTrips] = useState<Trip[]>([]);
+  const { isAuthenticated } = useAuth();
+  const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchTrips = async () => {
       try {
-        const res = await API.get("/trips");
-
-        // ✅ OVO JE KLJUČNA LINIJA
-        // backend vraća objekt, ne array
-        const tripsData = Array.isArray(res.data)
-          ? res.data
-          : res.data.data ?? res.data.trips ?? [];
-
-        setTrips(tripsData);
+        const res = await getTrips();
+        setTrips(res.data.trips ?? res.data ?? []);
       } catch (err) {
         console.error(err);
-        setError("Ne mogu dohvatiti putovanja");
       } finally {
         setLoading(false);
       }
     };
 
     fetchTrips();
-  }, []);
-
-  if (loading) return <p>Učitavanje...</p>;
-  if (error) return <p>{error}</p>;
+  }, [isAuthenticated]);
 
   return (
-    <div className="container mt-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Moja putovanja</h4>
-        <Link to="/trips/create" className="btn btn-primary">
-          + Novo putovanje
-        </Link>
-      </div>
+    <div className="tc-screen">
+      <h5 className="mb-3">All Trips</h5>
 
-      {trips.length === 0 && <p>Nema putovanja</p>}
+      {loading && <p>Loading…</p>}
 
-      {trips.map((trip) => (
-        <Link
-          key={trip.id}
-          to={`/trips/${trip.id}`}
-          className="card mb-2 text-decoration-none text-dark"
-        >
-          <div className="card-body">
-            <h5 className="card-title">{trip.title}</h5>
-            <p className="card-text">
-              📍 {trip.destination} | 💰 {trip.budget} €
-              {trip.is_public && (
-                <span className="badge bg-success ms-2">Public</span>
-              )}
-            </p>
+      {!loading && trips.length === 0 && (
+        <p className="text-muted">No trips available.</p>
+      )}
+
+      <div className="row g-3">
+        {trips.map((trip) => (
+          <div key={trip.id} className="col-12 col-md-6 col-lg-4">
+            <TripCard trip={trip} />
           </div>
-        </Link>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

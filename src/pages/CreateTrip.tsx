@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import API from "../api/api";
-import { fileToBase64 } from "../utils/images";
+import { createTrip } from "../api/api";
 
 type TripType = "planned" | "visited";
 
@@ -14,7 +13,6 @@ const CreateTrip = () => {
   const [destination, setDestination] = useState("");
   const [budget, setBudget] = useState<number | null>(null);
   const [isPublic, setIsPublic] = useState(false);
-
   const [description, setDescription] = useState("");
   const [images, setImages] = useState<File[]>([]);
 
@@ -22,7 +20,7 @@ const CreateTrip = () => {
   const [error, setError] = useState("");
   const [aiGenerated, setAiGenerated] = useState(false);
 
-  // ✅ PRIMI PODATKE IZ AI MODULA
+  // ✅ PODACI IZ AI MODULA
   useEffect(() => {
     if (!location.state) return;
 
@@ -40,13 +38,9 @@ const CreateTrip = () => {
     }
   }, [location.state]);
 
-  // ✅ LIMIT NA MAX 3 SLIKE
-  const handleImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    const selected = Array.from(e.target.files).slice(0, 3);
-    setImages(selected);
+    setImages(Array.from(e.target.files).slice(0, 1)); // ✅ samo cover slika
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,30 +49,29 @@ const CreateTrip = () => {
     setError("");
 
     try {
-      const res = await API.post("/trips", {
-        title,
-        destination,
-        budget,
-        is_public: isPublic,
-      });
+      const formData = new FormData();
 
-      const createdTrip = res.data.trip;
+      // ✅ OBAVEZNA POLJA
+      formData.append("title", title);
+      formData.append("destination", destination);
 
-      // ✅ SPREMI SAMO COVER SLIKU
-      if (tripType === "visited" && images.length > 0) {
-        try {
-          const coverImage = await fileToBase64(images[0]);
-          localStorage.setItem(
-            `trip_images_${createdTrip.id}`,
-            JSON.stringify([coverImage])
-          );
-        } catch {
-          console.warn(
-            "Image not saved due to storage limits."
-          );
-        }
+      // ✅ BACKEND OČEKUJE start_date
+      const today = new Date().toISOString().slice(0, 10);
+      formData.append("start_date", today);
+
+      // ✅ OPCIONALNA POLJA
+      formData.append("description", description);
+      if (budget !== null) {
+        formData.append("budget", String(budget));
+      }
+      formData.append("is_public", isPublic ? "1" : "0");
+
+      // ✅ SLIKA
+      if (images.length > 0) {
+        formData.append("image", images[0]);
       }
 
+      await createTrip(formData);
       navigate("/trips");
     } catch (err) {
       console.error(err);
@@ -99,9 +92,7 @@ const CreateTrip = () => {
       )}
 
       <form className="card tc-card p-3" onSubmit={handleSubmit}>
-        {error && (
-          <div className="alert alert-danger">{error}</div>
-        )}
+        {error && <div className="alert alert-danger">{error}</div>}
 
         <input
           className="form-control mb-2"
@@ -125,64 +116,30 @@ const CreateTrip = () => {
           placeholder="Budget"
           value={budget ?? ""}
           onChange={(e) =>
-            setBudget(
-              e.target.value ? Number(e.target.value) : null
-            )
+            setBudget(e.target.value ? Number(e.target.value) : null)
           }
         />
 
-        <select
-          className="form-select mb-2"
-          value={tripType}
-          onChange={(e) =>
-            setTripType(e.target.value as TripType)
-          }
-        >
-          <option value="planned">Planning</option>
-          <option value="visited">Already visited</option>
-        </select>
+        <textarea
+          className="form-control mb-2"
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-        {tripType === "visited" && (
-          <>
-            <textarea
-              className="form-control mb-2"
-              placeholder="Description / tips"
-              value={description}
-              onChange={(e) =>
-                setDescription(e.target.value)
-              }
-            />
+        <input
+          type="file"
+          accept="image/*"
+          className="form-control mb-2"
+          onChange={handleImageChange}
+        />
 
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              className="form-control mb-2"
-              onChange={handleImageChange}
-            />
-
-            {images.length > 0 && (
-              <div className="row g-2">
-                {images.map((img, i) => (
-                  <div key={i} className="col-4">
-                    <img
-                      src={URL.createObjectURL(img)}
-                      className="img-fluid rounded"
-                      alt="preview"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div
-              className="text-muted"
-              style={{ fontSize: 12 }}
-            >
-              Up to 3 images. Only the first image is saved
-              as cover.
-            </div>
-          </>
+        {images[0] && (
+          <img
+            src={URL.createObjectURL(images[0])}
+            className="img-fluid rounded mb-2"
+            alt="preview"
+          />
         )}
 
         <div className="form-check my-2">
@@ -190,19 +147,12 @@ const CreateTrip = () => {
             type="checkbox"
             className="form-check-input"
             checked={isPublic}
-            onChange={(e) =>
-              setIsPublic(e.target.checked)
-            }
+            onChange={(e) => setIsPublic(e.target.checked)}
           />
-          <label className="form-check-label">
-            Public
-          </label>
+          <label className="form-check-label">Public</label>
         </div>
 
-        <button
-          className="btn btn-primary tc-pill w-100"
-          disabled={loading}
-        >
+        <button className="btn btn-primary tc-pill w-100" disabled={loading}>
           {loading ? "Creating..." : "Create"}
         </button>
       </form>

@@ -1,115 +1,117 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { applyItinerary } from "../api/api";
 
-type Pace = "relaxed" | "normal" | "active";
+// ✅ TOČNE VRIJEDNOSTI KOJE BACKEND PRIHVAĆA
+type Pace = "lagano" | "normalno" | "brzo";
 type Budget = "low" | "medium" | "high";
 type Companion = "solo" | "partner" | "friends" | "family";
-type Accommodation = "budget" | "comfort" | "luxury";
-type TripStyle = "city" | "nature" | "mixed";
+type Experience = "relax" | "culture" | "adventure" | "party";
 
 const AI = () => {
   const navigate = useNavigate();
 
-  const [days, setDays] = useState("4-6");
-  const [pace, setPace] = useState<Pace>("normal");
-  const [interests, setInterests] = useState<string[]>([]);
+  // ✅ 8 PITANJA
+  const [days, setDays] = useState(5);
+  const [pace, setPace] = useState<Pace>("normalno");
   const [budget, setBudget] = useState<Budget>("medium");
   const [companion, setCompanion] =
     useState<Companion>("partner");
-  const [avoid, setAvoid] = useState<string[]>([]);
-  const [accommodation, setAccommodation] =
-    useState<Accommodation>("comfort");
-  const [tripStyle, setTripStyle] =
-    useState<TripStyle>("mixed");
+  const [experience, setExperience] =
+    useState<Experience>("culture");
 
-  const [result, setResult] = useState<{
-    destination: string;
-    reason: string;
-  } | null>(null);
+  const [likesFood, setLikesFood] = useState(true);
+  const [likesNature, setLikesNature] = useState(false);
+  const [likesNightlife, setLikesNightlife] =
+    useState(false);
 
-  const toggle = (
-    value: string,
-    list: string[],
-    setList: (v: string[]) => void
-  ) => {
-    setList(
-      list.includes(value)
-        ? list.filter((i) => i !== value)
-        : [...list, value]
-    );
+  const [plan, setPlan] = useState<any | null>(null);
+  const [chosenDestination, setChosenDestination] =
+    useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ FRONTEND LOGIKA – AI "SAM BIRA" DESTINACIJU
+  const pickDestination = (): string => {
+    if (experience === "adventure") return "Lisbon";
+    if (likesNightlife && companion === "friends")
+      return "Barcelona";
+    if (likesNature && budget !== "low")
+      return "Interlaken";
+    if (likesFood) return "Rome";
+    if (experience === "culture") return "Paris";
+    if (budget === "low") return "Budapest";
+
+    return "Paris";
   };
 
-  const generate = () => {
-    let destination = "Paris";
-    let reason =
-      "Balanced city with culture, food and attractions.";
+  // ✅ GRADIMO INTERESE ZA BACKEND (HR VRIJEDNOSTI)
+  const buildInterests = (): string[] => {
+    const interests: string[] = [];
+    if (likesFood) interests.push("hrana");
+    if (likesNature) interests.push("priroda");
+    if (likesNightlife) interests.push("nocni_zivot");
+    if (experience === "culture") interests.push("kultura");
 
-    if (tripStyle === "nature") {
-      destination = "Plitvice Lakes";
-      reason =
-        "Perfect for nature lovers and relaxed travel.";
+    return interests.length ? interests : ["kultura"];
+  };
+
+  const handleGenerate = async () => {
+    setLoading(true);
+
+    const destination = pickDestination();
+    setChosenDestination(destination);
+
+    try {
+      const payload = {
+        days,
+        pace,
+        budget,
+        companion,
+        experience,
+        interests: buildInterests(),
+        destination: pickDestination(),
+      };
+      const res = await applyItinerary(payload);
+
+      // ✅ PLAN JE U res.data.plan
+      setPlan(res.data.plan);
+    } catch (err) {
+      console.error(err);
+      alert("AI trenutno nije dostupan. Pokušaj ponovo.");
+    } finally {
+      setLoading(false);
     }
-
-    if (
-      interests.includes("nightlife") &&
-      companion === "friends"
-    ) {
-      destination = "Barcelona";
-      reason =
-        "Great nightlife and energetic city vibe.";
-    }
-
-    if (
-      interests.includes("food") &&
-      accommodation !== "budget"
-    ) {
-      destination = "Rome";
-      reason =
-        "World‑class food and rich cultural heritage.";
-    }
-
-    if (
-      tripStyle === "city" &&
-      interests.includes("shopping")
-    ) {
-      destination = "Milan";
-      reason =
-        "Ideal destination for fashion and shopping.";
-    }
-
-    if (
-      companion === "family" &&
-      avoid.includes("crowds")
-    ) {
-      destination = "Lake Bled";
-      reason =
-        "Calm, family‑friendly and beautiful nature.";
-    }
-
-    setResult({ destination, reason });
   };
 
   return (
     <div className="tc-screen">
       <h5 className="mb-3">AI Travel Assistant</h5>
 
-      {!result && (
+      {!plan && (
         <div className="card tc-card p-3">
-          {/* DAYS */}
+          <h6 className="fw-semibold mb-2">
+            Tell us about your trip
+          </h6>
+
+          {/* 1️⃣ DAYS */}
           <label className="form-label">
             How many days?
           </label>
-          <select
-            className="form-select mb-2"
+          <input
+            type="range"
+            min={3}
+            max={10}
             value={days}
-            onChange={(e) => setDays(e.target.value)}
-          >
-            <option>2-3</option>
-            <option>4-6</option>
-            <option>7+</option>
-          </select>
+            onChange={(e) =>
+              setDays(Number(e.target.value))
+            }
+            className="form-range mb-2"
+          />
+          <div className="text-muted mb-2">
+            {days} days
+          </div>
 
-          {/* PACE */}
+          {/* 2️⃣ PACE */}
           <label className="form-label">Pace</label>
           <select
             className="form-select mb-2"
@@ -118,12 +120,26 @@ const AI = () => {
               setPace(e.target.value as Pace)
             }
           >
-            <option value="relaxed">Relaxed</option>
-            <option value="normal">Normal</option>
-            <option value="active">Active</option>
+            <option value="lagano">Relaxed</option>
+            <option value="normalno">Normal</option>
+            <option value="brzo">Active</option>
           </select>
 
-          {/* COMPANION */}
+          {/* 3️⃣ BUDGET */}
+          <label className="form-label">Budget</label>
+          <select
+            className="form-select mb-2"
+            value={budget}
+            onChange={(e) =>
+              setBudget(e.target.value as Budget)
+            }
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+
+          {/* 4️⃣ COMPANION */}
           <label className="form-label">
             Who are you traveling with?
           </label>
@@ -131,7 +147,9 @@ const AI = () => {
             className="form-select mb-2"
             value={companion}
             onChange={(e) =>
-              setCompanion(e.target.value as Companion)
+              setCompanion(
+                e.target.value as Companion
+              )
             }
           >
             <option value="solo">Solo</option>
@@ -140,116 +158,119 @@ const AI = () => {
             <option value="family">Family</option>
           </select>
 
-          {/* INTERESTS */}
-          <label className="form-label">Interests</label>
-          {[
-            "food",
-            "nature",
-            "culture",
-            "nightlife",
-            "shopping",
-          ].map((i) => (
-            <div key={i} className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                checked={interests.includes(i)}
-                onChange={() =>
-                  toggle(i, interests, setInterests)
-                }
-              />
-              <label className="form-check-label">
-                {i}
-              </label>
-            </div>
-          ))}
-
-          {/* AVOID */}
-          <label className="form-label mt-2">
-            What do you want to avoid?
-          </label>
-          {["crowds", "heat", "walking", "prices"].map(
-            (a) => (
-              <div key={a} className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  checked={avoid.includes(a)}
-                  onChange={() =>
-                    toggle(a, avoid, setAvoid)
-                  }
-                />
-                <label className="form-check-label">
-                  {a}
-                </label>
-              </div>
-            )
-          )}
-
-          {/* ACCOMMODATION */}
-          <label className="form-label mt-2">
-            Accommodation
-          </label>
-          <select
-            className="form-select mb-2"
-            value={accommodation}
-            onChange={(e) =>
-              setAccommodation(
-                e.target.value as Accommodation
-              )
-            }
-          >
-            <option value="budget">Budget</option>
-            <option value="comfort">Comfort</option>
-            <option value="luxury">Luxury</option>
-          </select>
-
-          {/* STYLE */}
+          {/* 5️⃣ EXPERIENCE */}
           <label className="form-label">
-            Trip style
+            What do you want most?
           </label>
           <select
             className="form-select mb-3"
-            value={tripStyle}
+            value={experience}
             onChange={(e) =>
-              setTripStyle(e.target.value as TripStyle)
+              setExperience(
+                e.target.value as Experience
+              )
             }
           >
-            <option value="city">City break</option>
-            <option value="nature">
-              Nature & wellness
-            </option>
-            <option value="mixed">Mixed</option>
+            <option value="relax">Relax</option>
+            <option value="culture">Culture</option>
+            <option value="adventure">Adventure</option>
+            <option value="party">Party</option>
           </select>
+
+          {/* 6–8 ✅ */}
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={likesFood}
+              onChange={() =>
+                setLikesFood(!likesFood)
+              }
+            />
+            <label className="form-check-label">
+              I love good food
+            </label>
+          </div>
+
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={likesNature}
+              onChange={() =>
+                setLikesNature(!likesNature)
+              }
+            />
+            <label className="form-check-label">
+              I enjoy nature
+            </label>
+          </div>
+
+          <div className="form-check mb-3">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={likesNightlife}
+              onChange={() =>
+                setLikesNightlife(!likesNightlife)
+              }
+            />
+            <label className="form-check-label">
+              I enjoy nightlife
+            </label>
+          </div>
 
           <button
             className="btn btn-primary tc-pill w-100"
-            onClick={generate}
+            onClick={handleGenerate}
+            disabled={loading}
           >
-            Generate recommendation
+            {loading
+              ? "AI is thinking..."
+              : "Let AI choose my destination"}
           </button>
         </div>
       )}
 
-      {result && (
+      {plan && chosenDestination && (
         <div className="card tc-card p-3">
-          <h6 className="fw-semibold">
-            Recommended destination
+          <h6 className="fw-semibold mb-2">
+            AI chose destination:
           </h6>
-          <h4>{result.destination}</h4>
-          <p className="text-muted">{result.reason}</p>
+
+          <h4 className="mb-2">
+            {chosenDestination}
+          </h4>
+
+          {plan.days.map((day: any) => (
+            <div key={day.day} className="mb-3">
+              <strong>Day {day.day}</strong>
+              <ul>
+                {day.items.map((item: any, idx: number) => (
+                  <li key={idx}>
+                    <strong>{item.time}</strong> –{" "}
+                    {item.title}
+                    <span className="badge bg-light text-dark ms-2">
+                      {item.type}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
           <button
-            className="btn btn-primary tc-pill w-100"
+            className="btn btn-success tc-pill w-100"
             onClick={() =>
               navigate("/trips/create", {
                 state: {
-                  destination: result.destination,
+                  destination: chosenDestination,
+                  aiGenerated: true,
                 },
               })
             }
           >
-            Create trip with this recommendation
+            Create trip from this AI plan
           </button>
         </div>
       )}

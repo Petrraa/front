@@ -3,7 +3,7 @@ import type { TripData } from "../api/types";
 
 type Props = {
   initial?: Partial<TripData>;
-  onSubmit: (data: TripData) => Promise<void>;
+  onSubmit: (data: FormData) => Promise<void>;
   submitLabel?: string;
 };
 
@@ -17,34 +17,34 @@ const TripForm: React.FC<Props> = ({
   const [description, setDescription] = useState(initial?.description ?? "");
   const [price, setPrice] = useState<number>(initial?.price ?? 0);
   const [date, setDate] = useState(initial?.date ?? "");
+  const [image, setImage] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
 
     try {
-      await onSubmit({
-        title: title.trim(),
-        destination: destination.trim(),
-        description: description.trim(),
-        price: Number(price),
-        date,
-      });
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("destination", destination);
+      formData.append("description", description);
+      formData.append("price", String(price));
+      formData.append("date", date);
+
+      if (image) {
+        formData.append("image", image);
+      }
+
+      await onSubmit(formData);
     } catch (err: any) {
-      console.log("FULL ERROR:", err);
-      console.log("RESPONSE DATA:", err?.response?.data);
-      console.log("RESPONSE ERRORS:", err?.response?.data?.errors);
-
-      const msg =
+      setError(
         err?.response?.data?.message ||
-        JSON.stringify(err?.response?.data?.errors || err?.response?.data) ||
-        "Failed to save trip";
-
-      setError(msg);
+          "Failed to save trip"
+      );
     } finally {
       setLoading(false);
     }
@@ -52,73 +52,57 @@ const TripForm: React.FC<Props> = ({
 
   return (
     <form onSubmit={handleSubmit} className="card tc-card p-3">
-      {error && (
-        <div className="alert alert-danger py-2 mb-3" role="alert">
-          <div className="fw-semibold">Validation / Save error</div>
-          <div style={{ fontSize: 13, whiteSpace: "pre-wrap" }}>{error}</div>
-        </div>
-      )}
+      {error && <div className="alert alert-danger">{error}</div>}
 
-      <div className="mb-2">
-        <label className="form-label">Title</label>
-        <input
-          className="form-control tc-pill"
-          placeholder="e.g. Rome weekend"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-      </div>
+      <input
+        className="form-control mb-2"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        required
+      />
 
-      <div className="mb-2">
-        <label className="form-label">Destination</label>
-        <input
-          className="form-control tc-pill"
-          placeholder="e.g. Rome, Italy"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          required
-        />
-      </div>
+      <input
+        className="form-control mb-2"
+        placeholder="Destination"
+        value={destination}
+        onChange={(e) => setDestination(e.target.value)}
+        required
+      />
 
-      <div className="mb-2">
-        <label className="form-label">Description</label>
-        <textarea
-          className="form-control"
-          placeholder="Tell people what makes this trip special..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-          required
-        />
-      </div>
+      <textarea
+        className="form-control mb-2"
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        required
+      />
 
-      <div className="row g-2 mb-2">
-        <div className="col-6">
-          <label className="form-label">Price (€)</label>
-          <input
-            type="number"
-            className="form-control tc-pill"
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            required
-            min={0}
-          />
-        </div>
+      <input
+        type="number"
+        className="form-control mb-2"
+        placeholder="Price"
+        value={price}
+        onChange={(e) => setPrice(Number(e.target.value))}
+        required
+      />
 
-        <div className="col-6">
-          <label className="form-label">Date</label>
-          <input
-            type="date"
-            className="form-control tc-pill"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
-        </div>
-      </div>
+      <input
+        type="date"
+        className="form-control mb-2"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        required
+      />
 
-      <button className="btn btn-primary w-100 tc-pill" disabled={loading}>
+      <input
+        type="file"
+        className="form-control mb-3"
+        accept="image/*"
+        onChange={(e) => setImage(e.target.files?.[0] || null)}
+      />
+
+      <button className="btn btn-primary" disabled={loading}>
         {loading ? "Saving..." : submitLabel}
       </button>
     </form>

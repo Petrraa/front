@@ -5,17 +5,15 @@ import Login from "../pages/login";
 import { Register } from "../pages/Register";
 
 import Home from "../pages/Home";
-import AI from "../pages/AI";
-import Profile from "../pages/Profile";
-
 import TripsList from "../pages/TripsList";
 import TripDetails from "../pages/TripDetails";
 import CreateTrip from "../pages/CreateTrip";
 import EditTrip from "../pages/EditTrip";
+import Profile from "../pages/Profile";
+import AI from "../pages/AI";
 
 const AppRoutes = () => {
-  const { user } = useAuth();
-  const isAuthenticated = !!user;
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
@@ -37,16 +35,6 @@ const AppRoutes = () => {
       />
 
       <Route
-        path="/ai"
-        element={isAuthenticated ? <AI /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
-        path="/profile"
-        element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
         path="/trips"
         element={isAuthenticated ? <TripsList /> : <Navigate to="/login" replace />}
       />
@@ -65,6 +53,18 @@ const AppRoutes = () => {
         path="/trips/:id"
         element={isAuthenticated ? <TripDetails /> : <Navigate to="/login" replace />}
       />
+
+      <Route
+        path="/profile"
+        element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />}
+      />
+
+      <Route
+        path="/ai"
+        element={isAuthenticated ? <AI /> : <Navigate to="/login" replace />}
+      />
+
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 };

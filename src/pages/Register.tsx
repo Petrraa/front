@@ -1,63 +1,47 @@
-// src/pages/Register.tsx
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export const Register = () => {
+const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordConfirmation, setPasswordConfirmation] = useState("");
-
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
-
-    const payload = {
-      name,
-      username,
-      email,
-      password,
-      password_confirmation: passwordConfirmation,
-    };
+    setError("");
 
     try {
-      await register(payload);
-      setLoading(false);
+      await register({ name, email, password });
       navigate("/home");
-    } catch (err: any) {
+    } catch (err) {
+      console.error(err);
+      setError("Registration failed");
+    } finally {
       setLoading(false);
-      setError(err.response?.data?.message || "Neuspješna registracija");
     }
   };
 
   return (
-    <div className="tc-auth-bg">
-      <div className="tc-auth-card">
-        <div className="text-center mb-3">
-          <div className="fw-semibold">TravelConnect</div>
-          <div className="text-muted" style={{ fontSize: 13 }}>
-            Create your account
-          </div>
-        </div>
+    <div className="tc-screen d-flex align-items-center justify-content-center">
+      <div className="card tc-card p-4" style={{ maxWidth: 360, width: "100%" }}>
+        <h5 className="mb-3 text-center">Create account</h5>
 
         {error && (
-          <div className="alert alert-danger py-2" role="alert">
+          <div className="alert alert-danger py-2">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
           <input
-            className="form-control mb-2 tc-pill"
+            className="form-control mb-2"
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -65,15 +49,8 @@ export const Register = () => {
           />
 
           <input
-            className="form-control mb-2 tc-pill"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-
-          <input
-            className="form-control mb-2 tc-pill"
+            type="email"
+            className="form-control mb-2"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -81,36 +58,29 @@ export const Register = () => {
           />
 
           <input
-            className="form-control mb-2 tc-pill"
             type="password"
+            className="form-control mb-3"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          <input
-            className="form-control mb-3 tc-pill"
-            type="password"
-            placeholder="Confirm password"
-            value={passwordConfirmation}
-            onChange={(e) => setPasswordConfirmation(e.target.value)}
-            required
-          />
-
           <button
-            className="btn btn-primary w-100 tc-pill"
-            type="submit"
+            className="btn btn-primary w-100"
             disabled={loading}
           >
-            {loading ? "Registering..." : "Sign up"}
+            {loading ? "Creating..." : "Register"}
           </button>
         </form>
 
         <div className="text-center mt-3" style={{ fontSize: 13 }}>
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account?{" "}
+          <Link to="/login">Login</Link>
         </div>
       </div>
     </div>
   );
 };
+
+export default Register;

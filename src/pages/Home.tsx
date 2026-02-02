@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getTrips } from "../api/api";
-import type { TripData } from "../api/types";
-import TopBar from "../components/TopBar";
-import TripCard from "../components/TripCard";
 import { useAuth } from "../context/AuthContext";
+import { getTrips } from "../api/api";
+import TripCard from "../components/TripCard";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const { user } = useAuth();
-  const [trips, setTrips] = useState<TripData[]>([]);
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchTrips = async () => {
       try {
-        const { data } = await getTrips();
-        setTrips(data.trips); // ✅ JEDINO ISPRAVNO
+        const res = await getTrips();
+        setTrips(res.data.trips ?? res.data ?? []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -24,66 +25,42 @@ const Home = () => {
     };
 
     fetchTrips();
-  }, []);
+  }, [isAuthenticated]);
 
-  // ✅ samo public tripovi drugih usera
-  const publicTrips = trips.filter(
-    (t) => t.is_public && t.user_id !== user?.id
-  );
+  if (!isAuthenticated) {
+    return <div className="tc-screen text-muted">Loading…</div>;
+  }
 
-  const recommended = publicTrips[0];
-  const popular = publicTrips.slice(1, 7);
+  if (loading) {
+    return <div className="tc-screen text-muted">Loading trips…</div>;
+  }
+
+  const recommended = trips[0];
+  const popular = trips.slice(1, 5);
 
   return (
     <div className="tc-screen">
-      <TopBar />
+      <div className="mb-3">
+        <div className="text-muted">Welcome back</div>
+        <h5>{user?.name}</h5>
+      </div>
 
-      {/* HERO */}
-      <div className="tc-hero p-4 mb-3">
-        <div className="fw-semibold">AI Travel Assistant</div>
-        <div className="opacity-75" style={{ fontSize: 14 }}>
-          Answer a few questions and get a recommendation.
-        </div>
-        <Link to="/ai" className="btn btn-light tc-pill mt-3">
+      <div className="card tc-card p-3 mb-4">
+        <h6>AI Travel Assistant</h6>
+        <p>Answer a few questions and get a recommendation.</p>
+        <button className="btn btn-primary" onClick={() => navigate("/ai")}>
           Start AI
-        </Link>
+        </button>
       </div>
 
-      {/* RECOMMENDED */}
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h6 className="mb-0">Recommended</h6>
-        <Link
-          to="/trips"
-          className="text-decoration-none"
-          style={{ fontSize: 13 }}
-        >
-          See all
-        </Link>
-      </div>
+      <h6>Recommended</h6>
+      {recommended ? <TripCard trip={recommended} /> : <p>No trips yet.</p>}
 
-      {loading ? (
-        <div className="text-muted">Loading…</div>
-      ) : recommended ? (
-        <TripCard trip={recommended} />
-      ) : (
-        <div className="text-muted">No recommended trips yet.</div>
-      )}
-
-      {/* POPULAR */}
-      <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-        <h6 className="mb-0">Popular</h6>
-        <Link
-          to="/trips/create"
-          className="btn btn-sm btn-primary tc-pill"
-        >
-          + New trip
-        </Link>
-      </div>
-
+      <h6 className="mt-4">Popular</h6>
       <div className="row g-3">
-        {popular.map((t) => (
-          <div key={t.id} className="col-6">
-            <TripCard trip={t} />
+        {popular.map((trip) => (
+          <div key={trip.id} className="col-6">
+            <TripCard trip={trip} />
           </div>
         ))}
       </div>

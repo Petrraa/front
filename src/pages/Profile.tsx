@@ -1,78 +1,47 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getTrips } from "../api/api";
-import type { TripData } from "../api/types";
 import TripCard from "../components/TripCard";
 
 const Profile = () => {
-  const { user, logout } = useAuth();
-  const [myTrips, setMyTrips] = useState<TripData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated, logout } = useAuth();
+  const [trips, setTrips] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!isAuthenticated) return;
 
-    const fetchMyTrips = async () => {
-      try {
-        const { data } = await getTrips();
-
-        const ownedTrips = data.trips.filter(
-          (t) => t.user_id === user.id
-        );
-
-        setMyTrips(ownedTrips);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+    const fetchTrips = async () => {
+      const res = await getTrips();
+      setTrips(res.data.trips ?? res.data ?? []);
     };
 
-    fetchMyTrips();
-  }, [user]);
+    fetchTrips();
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <div className="tc-screen text-muted">Loading…</div>;
+  }
 
   return (
     <div className="tc-screen">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Profile</h5>
-        <button
-          className="btn btn-outline-danger btn-sm tc-pill"
-          onClick={logout}
-        >
+      <h5>Profile</h5>
+
+      <div className="card tc-card p-3 mb-3">
+        <div><strong>Name:</strong> {user?.name}</div>
+        <div><strong>Email:</strong> {user?.email}</div>
+
+        <button className="btn btn-outline-danger mt-2" onClick={logout}>
           Logout
         </button>
       </div>
 
-      {/* USER CARD */}
-      <div className="card tc-card p-3 mb-3">
-        <div className="d-flex gap-2 align-items-center">
-          <i className="bi bi-person-circle fs-1 text-secondary" />
-          <div>
-            <div className="fw-semibold">{user?.name}</div>
-            <div className="text-muted">{user?.email}</div>
+      <h6>My trips</h6>
+      <div className="row g-3">
+        {trips.map((trip) => (
+          <div key={trip.id} className="col-6">
+            <TripCard trip={trip} />
           </div>
-        </div>
-      </div>
-
-      {/* MY TRIPS */}
-      <div className="card tc-card p-3">
-        <div className="fw-semibold mb-2">My trips</div>
-
-        {loading && <div className="text-muted">Loading…</div>}
-
-        {!loading && myTrips.length === 0 && (
-          <div className="text-muted">
-            You haven't created any trips yet.
-          </div>
-        )}
-
-        <div className="row g-2">
-          {myTrips.map((trip) => (
-            <div key={trip.id} className="col-6">
-              <TripCard trip={trip} />
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
     </div>
   );

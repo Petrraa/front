@@ -1,24 +1,26 @@
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export const Header = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
 
   return (
-    <header className="tc-header">
+    <header className="d-flex justify-content-between align-items-center p-3 border-bottom">
+      <strong className="text-primary">TravelConnect</strong>
+
       {user ? (
-        <>
-          <span>Dobrodošao, {user.name}</span>
-          <button onClick={handleLogout}>Logout</button>
-        </>
+        <div className="d-flex align-items-center gap-3">
+          <span className="text-muted">
+            Welcome, <strong>{user.name}</strong>
+          </span>
+          <button
+            className="btn btn-outline-danger btn-sm tc-pill"
+            onClick={logout}
+          >
+            Logout
+          </button>
+        </div>
       ) : (
-        <span>Niste prijavljeni</span>
+        <span className="text-muted">Not logged in</span>
       )}
     </header>
   );
