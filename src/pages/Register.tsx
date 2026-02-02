@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/logo.png";
 
 const Register = () => {
   const { register } = useAuth();
@@ -20,8 +21,7 @@ const Register = () => {
     try {
       await register({ name, email, password });
       navigate("/home");
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Registration failed");
     } finally {
       setLoading(false);
@@ -29,9 +29,11 @@ const Register = () => {
   };
 
   return (
-    <div className="tc-screen d-flex align-items-center justify-content-center">
-      <div className="card tc-card p-4" style={{ maxWidth: 360, width: "100%" }}>
-        <h5 className="mb-3 text-center">Create account</h5>
+    <div className="auth-bg">
+      <div className="auth-card">
+        <img src={logo} alt="TravelConnect" className="auth-logo" />
+
+        <h5 className="mb-3">Create account</h5>
 
         {error && (
           <div className="alert alert-danger py-2">
@@ -49,7 +51,6 @@ const Register = () => {
           />
 
           <input
-            type="email"
             className="form-control mb-2"
             placeholder="Email"
             value={email}
@@ -70,11 +71,11 @@ const Register = () => {
             className="btn btn-primary w-100"
             disabled={loading}
           >
-            {loading ? "Creating..." : "Register"}
+            {loading ? "Creating..." : "Sign up"}
           </button>
         </form>
 
-        <div className="text-center mt-3" style={{ fontSize: 13 }}>
+        <div className="mt-3" style={{ fontSize: 13 }}>
           Already have an account?{" "}
           <Link to="/login">Login</Link>
         </div>

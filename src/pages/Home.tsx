@@ -36,34 +36,61 @@ const Home = () => {
   }
 
   const recommended = trips[0];
-  const popular = trips.slice(1, 5);
+  const popular = trips.slice(1, 6);
 
   return (
     <div className="tc-screen">
-      <div className="mb-3">
-        <div className="text-muted">Welcome back</div>
+      {/* WELCOME */}
+      <div className="home-welcome">
+        <small>Welcome back</small>
         <h5>{user?.name}</h5>
       </div>
 
-      <div className="card tc-card p-3 mb-4">
-        <h6>AI Travel Assistant</h6>
+      {/* AI CTA */}
+      <div className="home-ai-card mb-4">
+        <strong>AI Travel Assistant</strong>
         <p>Answer a few questions and get a recommendation.</p>
-        <button className="btn btn-primary" onClick={() => navigate("/ai")}>
+        <button
+          className="btn btn-light"
+          onClick={() => navigate("/ai")}
+        >
           Start AI
         </button>
       </div>
 
-      <h6>Recommended</h6>
-      {recommended ? <TripCard trip={recommended} /> : <p>No trips yet.</p>}
-
-      <h6 className="mt-4">Popular</h6>
-      <div className="row g-3">
-        {popular.map((trip) => (
-          <div key={trip.id} className="col-6">
-            <TripCard trip={trip} />
-          </div>
-        ))}
+      {/* RECOMMENDED */}
+      <div className="section-header">
+        <strong>Recommended</strong>
+        <span
+          className="see-all"
+          onClick={() => navigate("/trips")}
+        >
+          See all
+        </span>
       </div>
+
+      {recommended ? (
+        <TripCard trip={recommended} />
+      ) : (
+        <div className="empty-state">No trips yet.</div>
+      )}
+
+      {/* POPULAR */}
+      <div className="section-header">
+        <strong>Popular</strong>
+      </div>
+
+      {popular.length > 0 ? (
+        <div className="popular-scroll">
+          {popular.map((trip) => (
+            <div key={trip.id}>
+              <TripCard trip={trip} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">No popular trips.</div>
+      )}
     </div>
   );
 };

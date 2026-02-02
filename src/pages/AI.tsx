@@ -56,32 +56,32 @@ const AI = () => {
   };
 
   const handleGenerate = async () => {
-    setLoading(true);
+  setLoading(true);
 
-    const destination = pickDestination();
-    setChosenDestination(destination);
+  const destination = pickDestination();
+  setChosenDestination(destination);
 
-    try {
-      const payload = {
-        days,
-        pace,
-        budget,
-        companion,
-        experience,
-        interests: buildInterests(),
-        destination: pickDestination(),
-      };
-      const res = await applyItinerary(payload);
+  try {
+    // ✅ SAMO POLJA KOJA BACKEND OČEKUJE
+    const payload = {
+      destination,
+      days,
+      pace,
+      interests: buildInterests(),
+      replace: true,
+    };
 
-      // ✅ PLAN JE U res.data.plan
-      setPlan(res.data.plan);
-    } catch (err) {
-      console.error(err);
-      alert("AI trenutno nije dostupan. Pokušaj ponovo.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await applyItinerary(payload);
+
+    // ✅ plan dolazi iz res.data.plan
+    setPlan(res.data.plan);
+  } catch (err) {
+    console.error(err);
+    alert("AI trenutno nije dostupan. Pokušaj ponovo.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="tc-screen">

@@ -6,13 +6,20 @@ import TripCard from "../components/TripCard";
 const Profile = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [trips, setTrips] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
     const fetchTrips = async () => {
-      const res = await getTrips();
-      setTrips(res.data.trips ?? res.data ?? []);
+      try {
+        const res = await getTrips();
+        setTrips(res.data.trips ?? res.data ?? []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchTrips();
@@ -22,27 +29,66 @@ const Profile = () => {
     return <div className="tc-screen text-muted">Loading…</div>;
   }
 
+  if (loading) {
+    return <div className="tc-screen text-muted">Loading trips…</div>;
+  }
+
+  const lastTrip = trips[0];
+  const visited = trips.slice(1, 5);
+
   return (
     <div className="tc-screen">
-      <h5>Profile</h5>
-
-      <div className="card tc-card p-3 mb-3">
-        <div><strong>Name:</strong> {user?.name}</div>
-        <div><strong>Email:</strong> {user?.email}</div>
-
-        <button className="btn btn-outline-danger mt-2" onClick={logout}>
-          Logout
-        </button>
+      {/* HEADER */}
+      <div className="profile-header">
+        <h5>{user?.name}</h5>
+        <div className="email">{user?.email}</div>
       </div>
 
-      <h6>My trips</h6>
-      <div className="row g-3">
-        {trips.map((trip) => (
-          <div key={trip.id} className="col-6">
-            <TripCard trip={trip} />
+      {/* LAST TRIP */}
+      <div className="profile-section">
+        <strong>Last trip</strong>
+
+        <div className="mt-2">
+          {lastTrip ? (
+            <TripCard trip={lastTrip} />
+          ) : (
+            <div className="empty-state">No trips yet.</div>
+          )}
+        </div>
+      </div>
+
+      {/* VISITED */}
+      <div className="profile-section">
+        <strong>Visited</strong>
+
+        {visited.length > 0 ? (
+          <div className="visited-grid">
+            {visited.map((trip) => (
+              <div
+                key={trip.id}
+                className="tc-img"
+                style={{
+                  backgroundImage: `url(${
+                    trip.image
+                      ? `http://localhost:8000/storage/${trip.image}`
+                      : "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+                  })`,
+                }}
+              />
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="empty-state">No visited trips.</div>
+        )}
       </div>
+
+      {/* LOGOUT */}
+      <button
+        className="btn btn-outline-danger w-100 profile-logout"
+        onClick={logout}
+      >
+        Logout
+      </button>
     </div>
   );
 };

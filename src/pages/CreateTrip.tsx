@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createTrip } from "../api/api";
 
-type TripType = "planned" | "visited";
 
 const CreateTrip = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [tripType, setTripType] = useState<TripType>("planned");
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("");
   const [budget, setBudget] = useState<number | null>(null);
@@ -31,10 +29,6 @@ const CreateTrip = () => {
 
     if (location.state.budget) {
       setBudget(location.state.budget);
-    }
-
-    if (location.state.tripType) {
-      setTripType(location.state.tripType);
     }
   }, [location.state]);
 

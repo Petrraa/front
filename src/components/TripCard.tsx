@@ -1,38 +1,37 @@
 import { Link } from "react-router-dom";
 import type { TripData } from "../api/types";
 
-const TripCard: React.FC<{ trip: TripData }> = ({ trip }) => {
-  const imageUrl = (trip as any).image_url as string | undefined;
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=60";
+
+const TripCard = ({ trip }: { trip: TripData }) => {
+  const imageUrl = trip.image
+    ? `http://localhost:8000/storage/${trip.image}`
+    : FALLBACK_IMAGE;
 
   return (
-    <div className="card tc-card h-100">
-      <div
-        className="tc-img"
-        style={{ backgroundImage: imageUrl ? `url(${imageUrl})` : undefined }}
-      />
-      <div className="card-body">
-        <div className="d-flex justify-content-between align-items-start gap-2">
-          <div>
-            <div className="fw-semibold">{trip.title}</div>
-            <div className="text-muted" style={{ fontSize: 12 }}>
-              {trip.date}
-            </div>
+    <Link
+      to={`/trips/${trip.id}`}
+      className="text-decoration-none text-dark"
+    >
+      <div className="card tc-card trip-card h-100">
+        {/* IMAGE */}
+        <div
+          className="trip-card-image"
+          style={{ backgroundImage: `url(${imageUrl})` }}
+        />
+
+        {/* BODY */}
+        <div className="trip-card-body">
+          <div className="trip-card-title">
+            {trip.title}
           </div>
-          <span className="badge bg-primary tc-pill">€{trip.price}</span>
-        </div>
-
-        <div className="text-muted mt-2 text-truncate">{trip.description}</div>
-
-        <div className="mt-3">
-          <Link
-            to={`/trips/${trip.id}`}
-            className="btn btn-sm btn-outline-primary tc-pill"
-          >
-            View
-          </Link>
+          <div className="trip-card-destination">
+            {trip.destination}
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

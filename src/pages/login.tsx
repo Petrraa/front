@@ -1,55 +1,74 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/logo.png";
 
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [loginValue, setLoginValue] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
     try {
-      await login(email, password);
+      await login(loginValue, password);
       navigate("/home");
     } catch {
-      alert("Neuspješan login");
+      setError("Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="tc-auth-bg">
-      <div className="tc-auth-card">
-        <div className="text-center mb-3">
-          <div className="fw-semibold">TravelConnect</div>
-          <div className="text-muted" style={{ fontSize: 13 }}>
-            Sign in to continue
+    <div className="auth-bg">
+      <div className="auth-card">
+        <img src={logo} alt="TravelConnect" className="auth-logo" />
+
+        <h5 className="mb-3">Login</h5>
+
+        {error && (
+          <div className="alert alert-danger py-2">
+            {error}
           </div>
-        </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <input
-            className="form-control mb-2 tc-pill"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            className="form-control mb-2"
             placeholder="Email or username"
+            value={loginValue}
+            onChange={(e) => setLoginValue(e.target.value)}
+            required
           />
+
           <input
-            className="form-control mb-3 tc-pill"
             type="password"
+            className="form-control mb-3"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            required
           />
-          <button className="btn btn-primary w-100 tc-pill" type="submit">
-            Login
+
+          <button
+            className="btn btn-primary w-100"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <div className="text-center mt-3" style={{ fontSize: 13 }}>
-          No account? <Link to="/register">Sign up</Link>
+        <div className="mt-3" style={{ fontSize: 13 }}>
+          Don’t have an account?{" "}
+          <Link to="/register">Sign up</Link>
         </div>
       </div>
     </div>

@@ -1,70 +1,270 @@
 :root {
   --tc-primary: #0d6efd;
-  --tc-dark: #0b3a5b;
-  --tc-bg: #f6f7fb;
+  --tc-bg: #e1e1e4;
 }
 
+/* GLOBAL */
 body {
-  background: var(--tc-bg);
+  margin: 0;
+  background-color: var(--tc-bg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Ubuntu, "Helvetica Neue", sans-serif;
 }
 
+/* APP CONTAINER */
 .tc-app {
-  max-width: 430px; /* mobile look */
+  max-width: 520px;
   margin: 0 auto;
   min-height: 100vh;
-  padding-bottom: 78px; /* space for bottom nav */
+  padding-bottom: 72px;
 }
 
+/* PAGE */
 .tc-screen {
   padding: 16px;
 }
 
+/* CARD */
 .tc-card {
-  border: 0;
+  background: #fff;
   border-radius: 18px;
-  box-shadow: 0 10px 35px rgba(16, 24, 40, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 16px;
 }
 
-.tc-hero {
-  border-radius: 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(13, 110, 253, 0.92),
-    rgba(11, 58, 91, 0.92)
-  );
-  color: #fff;
-}
-
+/* IMAGE CARD */
 .tc-img {
   height: 150px;
   border-radius: 16px;
-  background: #e9ecef;
+  background-color: #e9ecef;
   background-size: cover;
   background-position: center;
 }
 
-.tc-pill {
+/* BUTTONS */
+button,
+.btn {
   border-radius: 999px;
 }
 
-/* auth background like mockup */
-.tc-auth-bg {
+/* LINKS */
+a {
+  text-decoration: none;
+  color: var(--tc-primary);
+}
+
+/* BOTTOM NAV FIX */
+nav a {
+  color: #6c757d;
+}
+
+nav a.active {
+  color: var(--tc-primary);
+}
+
+/* =========================
+   AUTH (LOGIN / REGISTER)
+========================= */
+
+/* Background like mockup (city + blur) */
+.auth-bg {
   min-height: 100vh;
-  background: linear-gradient(rgba(11, 58, 91, 0.45), rgba(11, 58, 91, 0.45)),
+  background: linear-gradient(
+      rgba(11, 58, 91, 0.45),
+      rgba(11, 58, 91, 0.45)
+    ),
     url("https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=60");
   background-size: cover;
   background-position: center;
-  display: grid;
-  place-items: center;
-  padding: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
 }
 
-.tc-auth-card {
+/* Card */
+.auth-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
+  background: #ffffff;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2);
-  padding: 18px;
+  padding: 24px 22px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+
+/* Small logo like mockup */
+.auth-logo {
+  width: 90px;       /* ✅ MALO */
+  margin-bottom: 12px;
+}
+
+/* Inputs spacing */
+.auth-card .form-control {
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* Primary button */
+.auth-card .btn-primary {
+  border-radius: 14px;
+  padding: 10px;
+}
+
+/* =========================
+   HOME POLISH (MOCKUP STYLE)
+========================= */
+
+/* Welcome text */
+.home-welcome {
+  margin-bottom: 20px;
+}
+
+.home-welcome small {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.home-welcome h5 {
+  font-weight: 600;
+}
+
+/* AI card polish */
+.home-ai-card {
+  border-radius: 22px;
+  padding: 22px;
+  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+  color: #fff;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+.home-ai-card p {
+  margin-bottom: 14px;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.home-ai-card .btn {
+  border-radius: 16px;
+  padding: 10px 16px;
+  font-weight: 500;
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 26px 0 12px;
+}
+
+.section-header strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.section-header .see-all {
+  font-size: 13px;
+  color: var(--tc-primary);
+  cursor: pointer;
+}
+
+/* Empty state */
+.empty-state {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Popular horizontal scroll */
+.popular-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.popular-scroll > div {
+  min-width: 190px;
+}
+
+/* =========================
+   PROFILE POLISH
+========================= */
+
+.profile-header {
+  margin-bottom: 24px;
+}
+
+.profile-header h5 {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.profile-header .email {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+/* Section spacing */
+.profile-section {
+  margin-bottom: 28px;
+}
+
+.profile-section strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Visited grid */
+.visited-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.visited-grid .tc-img {
+  height: 120px;
+}
+
+/* Logout button */
+.profile-logout {
+  margin-top: 24px;
+}
+
+/* =========================
+   TRIP CARD POLISH
+========================= */
+
+.trip-card {
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trip-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
+}
+
+.trip-card-image {
+  height: 160px;
+  border-radius: 16px 16px 0 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.trip-card-body {
+  padding: 12px 14px;
+}
+
+.trip-card-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.trip-card-destination {
+  font-size: 13px;
+  color: #6c757d;
 }

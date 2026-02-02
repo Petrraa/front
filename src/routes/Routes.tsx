@@ -2,8 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 import Login from "../pages/login";
-import { Register } from "../pages/Register";
-
+import Register from "../pages/Register";
 import Home from "../pages/Home";
 import TripsList from "../pages/TripsList";
 import TripDetails from "../pages/TripDetails";
@@ -19,52 +18,18 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/home" replace />} />
 
-      <Route
-        path="/login"
-        element={!isAuthenticated ? <Login /> : <Navigate to="/home" replace />}
-      />
+      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/home" />} />
 
-      <Route
-        path="/register"
-        element={!isAuthenticated ? <Register /> : <Navigate to="/home" replace />}
-      />
+      <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
+      <Route path="/trips" element={isAuthenticated ? <TripsList /> : <Navigate to="/login" />} />
+      <Route path="/trips/create" element={isAuthenticated ? <CreateTrip /> : <Navigate to="/login" />} />
+      <Route path="/trips/edit/:id" element={isAuthenticated ? <EditTrip /> : <Navigate to="/login" />} />
+      <Route path="/trips/:id" element={isAuthenticated ? <TripDetails /> : <Navigate to="/login" />} />
+      <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
+      <Route path="/ai" element={isAuthenticated ? <AI /> : <Navigate to="/login" />} />
 
-      <Route
-        path="/home"
-        element={isAuthenticated ? <Home /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
-        path="/trips"
-        element={isAuthenticated ? <TripsList /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
-        path="/trips/create"
-        element={isAuthenticated ? <CreateTrip /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
-        path="/trips/edit/:id"
-        element={isAuthenticated ? <EditTrip /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
-        path="/trips/:id"
-        element={isAuthenticated ? <TripDetails /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
-        path="/profile"
-        element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />}
-      />
-
-      <Route
-        path="/ai"
-        element={isAuthenticated ? <AI /> : <Navigate to="/login" replace />}
-      />
-
-      <Route path="*" element={<Navigate to="/home" replace />} />
+      <Route path="*" element={<Navigate to="/home" />} />
     </Routes>
   );
 };
