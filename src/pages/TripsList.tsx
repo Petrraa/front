@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import TripCard from "../components/TripCard";
 
 const TripsList = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,15 @@ const TripsList = () => {
     const fetchTrips = async () => {
       try {
         const res = await getTrips();
-        setTrips(res.data.trips ?? res.data ?? []);
+        const allTrips = res.data.trips ?? res.data ?? [];
+
+        // ✅ SAMO TUĐI PUBLIC TRIPOVI
+        const publicTrips = allTrips.filter(
+          (trip: any) =>
+            trip.is_public && trip.user_id !== user?.id
+        );
+
+        setTrips(publicTrips);
       } catch (err) {
         console.error(err);
       } finally {
@@ -25,7 +33,7 @@ const TripsList = () => {
     };
 
     fetchTrips();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   if (!isAuthenticated) {
     return <div className="tc-screen text-muted">Loading…</div>;
@@ -37,7 +45,6 @@ const TripsList = () => {
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">Trips</h5>
 
-        {/* ✅ NEW TRIP BUTTON */}
         <button
           className="btn btn-primary tc-pill"
           onClick={() => navigate("/trips/create")}
@@ -50,8 +57,7 @@ const TripsList = () => {
 
       {!loading && trips.length === 0 && (
         <div className="text-muted mt-3">
-          You don’t have any trips yet.  
-          Create your first trip!
+          No public trips available.
         </div>
       )}
 

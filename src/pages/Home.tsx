@@ -16,7 +16,15 @@ const Home = () => {
     const fetchTrips = async () => {
       try {
         const res = await getTrips();
-        setTrips(res.data.trips ?? res.data ?? []);
+        const allTrips = res.data.trips ?? res.data ?? [];
+
+        // ✅ SAMO TUĐI PUBLIC TRIPOVI
+        const publicTrips = allTrips.filter(
+          (trip: any) =>
+            trip.is_public && trip.user_id !== user?.id
+        );
+
+        setTrips(publicTrips);
       } catch (err) {
         console.error(err);
       } finally {
@@ -25,7 +33,7 @@ const Home = () => {
     };
 
     fetchTrips();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   if (!isAuthenticated) {
     return <div className="tc-screen text-muted">Loading…</div>;

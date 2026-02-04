@@ -2,6 +2,20 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 
+/* ✅ EMOJI MAPA – koristi se samo kod dodavanja aktivnosti */
+const typeEmoji = (type: string) => {
+  switch (type) {
+    case "food":
+      return "🍽️";
+    case "hotel":
+      return "🏨";
+    case "transport":
+      return "🚗";
+    default:
+      return "📍";
+  }
+};
+
 const EditTrip = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -10,17 +24,17 @@ const EditTrip = () => {
   const [trip, setTrip] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // basic trip fields
+  // BASIC INFO
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("");
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState<number | null>(null);
   const [isPublic, setIsPublic] = useState(false);
 
-  // ✅ NOVO: nove galerijske slike
+  // ✅ GALERIJA – VRAĆENO
   const [newImages, setNewImages] = useState<File[]>([]);
 
-  // new activity inputs (postojeće)
+  // ITINERARY INPUTS
   const [newItemTitle, setNewItemTitle] = useState("");
   const [newItemTime, setNewItemTime] = useState("09:00");
   const [newItemType, setNewItemType] = useState("activity");
@@ -41,7 +55,57 @@ const EditTrip = () => {
     })();
   }, [tripId]);
 
-  /* ---------- SAVE TRIP (NA DNU) ---------- */
+  /* ✅ ADD DAY */
+  const addDay = async () => {
+    const nextDayIndex =
+      trip?.days && trip.days.length > 0
+        ? Math.max(...trip.days.map((d: any) => d.day_index)) + 1
+        : 1;
+
+    await API.post(`/trips/${tripId}/days`, {
+      day_index: nextDayIndex,
+    });
+
+    const refreshed = await API.get(`/trips/${tripId}`);
+    setTrip(refreshed.data.trip);
+  };
+
+  /* ✅ DELETE DAY */
+  const deleteDay = async (dayId: number) => {
+    await API.delete(`/days/${dayId}`);
+    const refreshed = await API.get(`/trips/${tripId}`);
+    setTrip(refreshed.data.trip);
+  };
+
+  /* ✅ ADD ACTIVITY – emoji se dodaje u title */
+  const addActivity = async (dayId: number) => {
+    if (!newItemTitle.trim()) return;
+
+    const emoji = typeEmoji(newItemType);
+    const titleWithEmoji = `${emoji} ${newItemTitle}`;
+
+    await API.post(`/days/${dayId}/items`, {
+      title: titleWithEmoji,
+      start_time: newItemTime,
+      item_type: newItemType,
+    });
+
+    setNewItemTitle("");
+    setNewItemTime("09:00");
+    setNewItemType("activity");
+
+    const refreshed = await API.get(`/trips/${tripId}`);
+    setTrip(refreshed.data.trip);
+  };
+
+  /* ✅ DELETE ACTIVITY */
+  const deleteActivity = async (itemId: number) => {
+    await API.delete(`/items/${itemId}`);
+    const refreshed = await API.get(`/trips/${tripId}`);
+    setTrip(refreshed.data.trip);
+  };
+
+  /* ✅ SAVE TRIP – S UKLJUČENIM FOTOGRAFIJAMA */
   const saveTrip = async () => {
     const formData = new FormData();
     formData.append("title", title);
@@ -50,7 +114,7 @@ const EditTrip = () => {
     if (budget !== null) formData.append("budget", String(budget));
     formData.append("is_public", isPublic ? "1" : "0");
 
-    // ✅ NOVO: dodavanje novih slika
+    // ✅ GALERIJA – upload
     newImages.forEach((img) => {
       if (img.size <= 2 * 1024 * 1024) {
         formData.append("images[]", img);
@@ -103,7 +167,7 @@ const EditTrip = () => {
           placeholder="Budget"
         />
 
-        {/* ✅ NOVO: upload još slika */}
+        {/* ✅ UPLOAD FOTOGRAFIJA – VRAĆENO */}
         <label className="form-label">Add more photos</label>
         <input
           type="file"
@@ -126,11 +190,88 @@ const EditTrip = () => {
         </div>
       </div>
 
-      {/* ITINERARY – OSTAVLJENO KAKO JE BILO */}
-      {/* ... tvoj postojeći itinerary kod ... */}
+      {/* ITINERARY */}
+      <div className="itinerary-wrap">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <strong>Itinerary</strong>
+          <button
+            type="button"
+            className="btn btn-outline-primary btn-sm"
+            onClick={addDay}
+          >
+            + Add day
+          </button>
+        </div>
+
+        {trip.days?.map((day: any) => (
+          <div key={day.id} className="day-card">
+            <div className="day-card-header">
+              <strong>Day {day.day_index}</strong>
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-sm"
+                onClick={() => deleteDay(day.id)}
+              >
+                Delete day
+              </button>
+            </div>
+
+            {day.items?.map((item: any) => (
+              <div key={item.id} className="activity-row">
+                <div className="activity-time">{item.start_time}</div>
+                <div className="activity-content">{item.title}</div>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => deleteActivity(item.id)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+            {/* ADD ACTIVITY */}
+            <div className="add-activity">
+              <input
+                className="form-control"
+                placeholder="Activity"
+                value={newItemTitle}
+                onChange={(e) => setNewItemTitle(e.target.value)}
+              />
+
+              <input
+                type="time"
+                className="form-control"
+                value={newItemTime}
+                onChange={(e) => setNewItemTime(e.target.value)}
+              />
+
+              <select
+                className="form-control"
+                value={newItemType}
+                onChange={(e) => setNewItemType(e.target.value)}
+              >
+                <option value="activity">Activity</option>
+                <option value="food">Food</option>
+                <option value="hotel">Hotel</option>
+                <option value="transport">Transport</option>
+              </select>
+
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => addActivity(day.id)}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <button
-        className="btn btn-primary tc-pill w-100"
+        type="button"
+        className="btn btn-primary tc-pill w-100 mt-3"
         onClick={saveTrip}
       >
         Save trip

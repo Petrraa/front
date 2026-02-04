@@ -21,7 +21,11 @@ const Profile = () => {
         // ✅ My trips
         const tripsRes = await getTrips();
         const trips = tripsRes.data.trips ?? tripsRes.data ?? [];
-        setMyTrips(trips);
+        const onlyMyTrips = trips.filter(
+          (trip: any) => trip.user_id === user?.id
+        );
+
+        setMyTrips(onlyMyTrips);
 
         // ✅ Liked trips (preko posts)
         const postsRes = await getPosts();

@@ -1,56 +1,78 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { TripData } from "../api/types";
-import { getPosts, togglePostLike } from "../api/api";
+import { shareTrip, togglePostLike } from "../api/api";
 import { useAuth } from "../context/AuthContext";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=60";
 
-interface Post {
+interface PostState {
   id: number;
-  trip_id: number;
   likes_count: number;
   liked: boolean;
-  trip: TripData;
 }
 
-const TripCard = ({ trip }: { trip: TripData }) => {
-  const { user } = useAuth();
-  const [post, setPost] = useState<Post | null>(null);
+interface TripCardProps {
+  trip: TripData & {
+    post_id?: number;
+    likes_count?: number;
+    liked?: boolean;
+  };
+}
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await getPosts();
-        const posts: Post[] = res.data.posts ?? res.data ?? [];
-        const found = posts.find((p) => p.trip_id === trip.id);
-        if (found) setPost(found);
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, [trip.id]);
+const TripCard = ({ trip }: TripCardProps) => {
+  const { user } = useAuth();
+
+  // ✅ init iz propsa (bitno!)
+  const [post, setPost] = useState<PostState | null>(
+    trip.post_id
+      ? {
+          id: trip.post_id,
+          likes_count: trip.likes_count ?? 0,
+          liked: !!trip.liked,
+        }
+      : null
+  );
+
+  const [loading, setLoading] = useState(false);
 
   const handleLike = async () => {
-    if (!post) return;
-    if (trip.user_id === user?.id) return; // ✅ ne možeš lajkati svoj trip
+    if (!user || loading || trip.user_id === user.id || !trip.id) return;
 
     try {
-      const res = await togglePostLike(post.id);
+      setLoading(true);
+      let currentPost = post;
+
+      // ✅ ako post ne postoji → kreiraj
+      if (!currentPost) {
+        const shareRes = await shareTrip(trip.id);
+        currentPost = {
+          id: shareRes.data.post.id,
+          likes_count: shareRes.data.post.likes_count,
+          liked: false,
+        };
+        setPost(currentPost);
+      }
+
+      // ✅ toggle like
+      const likeRes = await togglePostLike(currentPost.id);
+
       setPost((prev) =>
         prev
           ? {
               ...prev,
-              liked: res.data.liked,
-              likes_count: res.data.liked
+              liked: likeRes.data.liked,
+              likes_count: likeRes.data.liked
                 ? prev.likes_count + 1
                 : prev.likes_count - 1,
             }
           : prev
       );
     } catch (err) {
-      console.error(err);
+      console.error("LIKE ERROR", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,17 +80,12 @@ const TripCard = ({ trip }: { trip: TripData }) => {
     ? `http://localhost:8000/storage/${trip.image}`
     : FALLBACK_IMAGE;
 
-  const isPopular = post && post.likes_count >= 5;
-  const isLiked = post?.liked;
+  const isLiked = post?.liked ?? false;
+  const likesCount = post?.likes_count ?? 0;
+  const isOwner = trip.user_id === user?.id;
 
   return (
-    <div
-      className={`card tc-card h-100 position-relative trip-card ${
-        isLiked ? "liked" : ""
-      }`}
-    >
-      {isPopular && <div className="trip-badge">Popular</div>}
-
+    <div className="card tc-card h-100">
       <Link to={`/trips/${trip.id}`} className="text-decoration-none text-dark">
         <div
           className="tc-img"
@@ -82,16 +99,17 @@ const TripCard = ({ trip }: { trip: TripData }) => {
         </div>
       </Link>
 
-      {post && trip.user_id !== user?.id && (
+      {user && !isOwner && (
         <div className="d-flex justify-content-between align-items-center px-2 pb-2">
           <button
             className="btn btn-sm btn-light"
             onClick={handleLike}
+            disabled={loading}
           >
-            {isLiked ? "❤️" : "🤍"} {post.likes_count}
+            {isLiked ? "❤️" : "🤍"} {likesCount}
           </button>
           <span className="text-muted" style={{ fontSize: 12 }}>
-            Shared
+            {isLiked ? "Liked" : "Click to like"}
           </span>
         </div>
       )}

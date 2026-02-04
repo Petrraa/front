@@ -22,24 +22,24 @@ export default API;
 
 // ================= AUTH =================
 
+export interface RegisterData {
+  name: string;  
+  username: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
 export const loginUser = (data: {
   login: string;
   password: string;
 }) => API.post("/auth/login", data);
 
-export const registerUser = (data: {
-  name: string;
-  email: string;
-  password: string;
-}) => API.post("/auth/register", data);
+export const registerUser = (data: RegisterData) =>
+  API.post("/auth/register", data);
 
 export const logoutUser = () => API.post("/auth/logout");
 
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-}
 
 // ================= TRIPS =================
 export const getTrips = () => API.get("/trips");
