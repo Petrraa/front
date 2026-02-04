@@ -1,104 +1,121 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
-import { fileToBase64 } from "../utils/images";
 
 const EditTrip = () => {
-  const { id } = useParams();
-  const tripId = Number(id);
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const tripId = Number(id);
 
+  const [trip, setTrip] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // basic trip fields
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("");
-  const [budget, setBudget] = useState(0);
+  const [description, setDescription] = useState("");
+  const [budget, setBudget] = useState<number | null>(null);
   const [isPublic, setIsPublic] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  // ✅ NOVO: nove galerijske slike
+  const [newImages, setNewImages] = useState<File[]>([]);
+
+  // new activity inputs (postojeće)
+  const [newItemTitle, setNewItemTitle] = useState("");
+  const [newItemTime, setNewItemTime] = useState("09:00");
+  const [newItemType, setNewItemType] = useState("activity");
 
   useEffect(() => {
     (async () => {
       const res = await API.get(`/trips/${tripId}`);
-      const trip = res.data.trip;
+      const t = res.data.trip;
 
-      setTitle(trip.title);
-      setDestination(trip.destination);
-      setBudget(trip.budget ?? 0);
-      setIsPublic(trip.is_public);
-
-      const stored = localStorage.getItem(`trip_images_${tripId}`);
-      if (stored) setImages(JSON.parse(stored));
+      setTrip(t);
+      setTitle(t.title);
+      setDestination(t.destination);
+      setDescription(t.description ?? "");
+      setBudget(t.budget ?? null);
+      setIsPublic(t.is_public);
 
       setLoading(false);
     })();
   }, [tripId]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  /* ---------- SAVE TRIP (NA DNU) ---------- */
+  const saveTrip = async () => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("destination", destination);
+    formData.append("description", description);
+    if (budget !== null) formData.append("budget", String(budget));
+    formData.append("is_public", isPublic ? "1" : "0");
 
-    await API.put(`/trips/${tripId}`, {
-      title,
-      destination,
-      budget,
-      is_public: isPublic,
+    // ✅ NOVO: dodavanje novih slika
+    newImages.forEach((img) => {
+      if (img.size <= 2 * 1024 * 1024) {
+        formData.append("images[]", img);
+      }
     });
 
-    localStorage.setItem(
-      `trip_images_${tripId}`,
-      JSON.stringify(images)
-    );
+    await API.post(`/trips/${tripId}?_method=PUT`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
     navigate(`/trips/${tripId}`);
   };
 
-  if (loading) return <div>Loading…</div>;
+  if (loading) return <div className="tc-screen">Loading…</div>;
 
   return (
     <div className="tc-screen">
-      <h5>Edit trip</h5>
+      <h5 className="mb-3">Edit trip</h5>
 
-      <form className="card tc-card p-3" onSubmit={handleSubmit}>
+      {/* BASIC INFO */}
+      <div className="card tc-card p-3 mb-4">
         <input
           className="form-control mb-2"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
         />
 
         <input
           className="form-control mb-2"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
+          placeholder="Destination"
+        />
+
+        <textarea
+          className="form-control mb-2"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Description"
         />
 
         <input
           type="number"
           className="form-control mb-2"
-          value={budget}
-          onChange={(e) => setBudget(Number(e.target.value))}
+          value={budget ?? ""}
+          onChange={(e) =>
+            setBudget(e.target.value ? Number(e.target.value) : null)
+          }
+          placeholder="Budget"
         />
 
+        {/* ✅ NOVO: upload još slika */}
+        <label className="form-label">Add more photos</label>
         <input
           type="file"
           multiple
           accept="image/*"
           className="form-control mb-2"
-          onChange={async (e) => {
-            if (!e.target.files) return;
-            const imgs = await Promise.all(
-              Array.from(e.target.files).map((f) => fileToBase64(f))
-            );
-            setImages((prev) => [...prev, ...imgs]);
-          }}
+          onChange={(e) =>
+            setNewImages(Array.from(e.target.files ?? []))
+          }
         />
 
-        <div className="row g-2 mb-2">
-          {images.map((img, i) => (
-            <div key={i} className="col-4">
-              <img src={img} className="img-fluid rounded" />
-            </div>
-          ))}
-        </div>
-
-        <div className="form-check mb-2">
+        <div className="form-check mt-2">
           <input
             type="checkbox"
             className="form-check-input"
@@ -107,11 +124,17 @@ const EditTrip = () => {
           />
           <label className="form-check-label">Public</label>
         </div>
+      </div>
 
-        <button className="btn btn-primary tc-pill w-100">
-          Save
-        </button>
-      </form>
+      {/* ITINERARY – OSTAVLJENO KAKO JE BILO */}
+      {/* ... tvoj postojeći itinerary kod ... */}
+
+      <button
+        className="btn btn-primary tc-pill w-100"
+        onClick={saveTrip}
+      >
+        Save trip
+      </button>
     </div>
   );
 };

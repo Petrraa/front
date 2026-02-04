@@ -63,6 +63,9 @@ export const togglePostLike = (postId: number) =>
 export const applyItinerary = (payload: any) =>
   API.post("/ai/plan-and-apply", payload); 
 
+export const generateAIPlan = (payload: any) =>
+  API.post("/ai/plan", payload);
+
 // ================= SHARE / FORK =================
 export const forkTrip = (id: number) => API.post(`/trips/${id}/fork`);
 

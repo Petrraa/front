@@ -2,40 +2,34 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createTrip } from "../api/api";
 
-
 const CreateTrip = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("");
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
   const [budget, setBudget] = useState<number | null>(null);
   const [isPublic, setIsPublic] = useState(false);
   const [description, setDescription] = useState("");
-  const [images, setImages] = useState<File[]>([]);
+  const [image, setImage] = useState<File | null>(null);
+
+  // ✅ NOVO: galerija
+  const [galleryImages, setGalleryImages] = useState<File[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [aiGenerated, setAiGenerated] = useState(false);
 
-  // ✅ PODACI IZ AI MODULA
   useEffect(() => {
     if (!location.state) return;
-
     if (location.state.destination) {
       setDestination(location.state.destination);
       setAiGenerated(true);
     }
-
-    if (location.state.budget) {
-      setBudget(location.state.budget);
-    }
   }, [location.state]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    setImages(Array.from(e.target.files).slice(0, 1)); // ✅ samo cover slika
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,28 +42,34 @@ const CreateTrip = () => {
       // ✅ OBAVEZNA POLJA
       formData.append("title", title);
       formData.append("destination", destination);
+      formData.append("start_date", startDate);
 
-      // ✅ BACKEND OČEKUJE start_date
-      const today = new Date().toISOString().slice(0, 10);
-      formData.append("start_date", today);
-
-      // ✅ OPCIONALNA POLJA
+      // ✅ OPCIONALNA
       formData.append("description", description);
-      if (budget !== null) {
-        formData.append("budget", String(budget));
-      }
+      if (budget !== null) formData.append("budget", String(budget));
       formData.append("is_public", isPublic ? "1" : "0");
 
-      // ✅ SLIKA
-      if (images.length > 0) {
-        formData.append("image", images[0]);
-      }
+      // ✅ COVER SLIKA (postojeće)
+      if (image) formData.append("image", image);
+
+      // ✅ GALERIJA (novo)
+      galleryImages.forEach((img) => {
+        if (img.size > 2 * 1024 * 1024) {
+          throw new Error("Each gallery image must be smaller than 2 MB.");
+        }
+        formData.append("images[]", img);
+      });
 
       await createTrip(formData);
       navigate("/trips");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to create trip");
+    } catch (err: any) {
+      console.error("CREATE TRIP ERROR:", err.response?.data);
+      setError(
+        err.response?.data?.message ||
+          JSON.stringify(err.response?.data?.errors) ||
+          err.message ||
+          "Failed to create trip"
+      );
     } finally {
       setLoading(false);
     }
@@ -77,10 +77,10 @@ const CreateTrip = () => {
 
   return (
     <div className="tc-screen">
-      <h5>Create new trip</h5>
+      <h5 className="mb-3">Create new trip</h5>
 
       {aiGenerated && (
-        <div className="alert alert-info py-2">
+        <div className="alert alert-info">
           This trip is based on an AI recommendation ✨
         </div>
       )}
@@ -105,6 +105,14 @@ const CreateTrip = () => {
         />
 
         <input
+          type="date"
+          className="form-control mb-2"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          required
+        />
+
+        <input
           type="number"
           className="form-control mb-2"
           placeholder="Budget"
@@ -121,22 +129,53 @@ const CreateTrip = () => {
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        <input
-          type="file"
-          accept="image/*"
-          className="form-control mb-2"
-          onChange={handleImageChange}
-        />
-
-        {images[0] && (
-          <img
-            src={URL.createObjectURL(images[0])}
-            className="img-fluid rounded mb-2"
-            alt="preview"
+        {/* ✅ POSTOJEĆI COVER PREVIEW */}
+        {image && (
+          <div
+            className="image-preview"
+            style={{
+              backgroundImage: `url(${URL.createObjectURL(image)})`,
+            }}
           />
         )}
 
-        <div className="form-check my-2">
+        {/* ✅ POSTOJEĆI COVER UPLOAD */}
+        <input
+          type="file"
+          accept="image/*"
+          className="form-control mb-3"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+              setError("Image must be smaller than 2 MB.");
+              e.target.value = "";
+              setImage(null);
+              return;
+            }
+
+            setError("");
+            setImage(file);
+          }}
+        />
+
+        {/* ✅ NOVO: GALERIJA UPLOAD */}
+        <label className="form-label">Gallery images</label>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          className="form-control mb-3"
+          onChange={(e) =>
+            setGalleryImages(Array.from(e.target.files ?? []))
+          }
+        />
+        <small className="text-muted">
+          You can add multiple images (max 2 MB each).
+        </small>
+
+        <div className="form-check mb-3 mt-3">
           <input
             type="checkbox"
             className="form-check-input"

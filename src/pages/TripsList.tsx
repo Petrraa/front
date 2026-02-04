@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getTrips } from "../api/api";
 import { useAuth } from "../context/AuthContext";
 import TripCard from "../components/TripCard";
 
 const TripsList = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,19 +27,37 @@ const TripsList = () => {
     fetchTrips();
   }, [isAuthenticated]);
 
+  if (!isAuthenticated) {
+    return <div className="tc-screen text-muted">Loading…</div>;
+  }
+
   return (
     <div className="tc-screen">
-      <h5 className="mb-3">All Trips</h5>
+      {/* HEADER */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 className="mb-0">Trips</h5>
 
-      {loading && <p>Loading…</p>}
+        {/* ✅ NEW TRIP BUTTON */}
+        <button
+          className="btn btn-primary tc-pill"
+          onClick={() => navigate("/trips/create")}
+        >
+          + New trip
+        </button>
+      </div>
+
+      {loading && <div className="text-muted">Loading trips…</div>}
 
       {!loading && trips.length === 0 && (
-        <p className="text-muted">No trips available.</p>
+        <div className="text-muted mt-3">
+          You don’t have any trips yet.  
+          Create your first trip!
+        </div>
       )}
 
-      <div className="row g-3">
+      <div className="row g-3 mt-2">
         {trips.map((trip) => (
-          <div key={trip.id} className="col-12 col-md-6 col-lg-4">
+          <div key={trip.id} className="col-12 col-md-6">
             <TripCard trip={trip} />
           </div>
         ))}

@@ -1,0 +1,48 @@
+body {
+  background-color: #f5f6f8;
+}
+
+.tc-screen {
+  padding: 16px;
+}
+
+.tc-card {
+  border-radius: 16px;
+}
+
+.auth-card {
+  max-width: 360px;
+  margin: auto;
+}
+
+.center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================
+   TRIP DETAILS – GALLERY (MOCKUP)
+========================= */
+
+.trip-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.trip-gallery .tc-img {
+  height: 120px;
+}
+
+/* Gumb za itinerary */
+.itinerary-toggle {
+  margin-top: 12px;
+}
+
+/* Itinerary container (kad se otvori) */
+.itinerary-box {
+  margin-top: 16px;
+}
