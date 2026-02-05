@@ -44,13 +44,11 @@ const TripDetails = () => {
         ← Back
       </Link>
 
-      {/* HERO */}
       <div
         className="trip-hero"
         style={{ backgroundImage: `url(${heroImage})` }}
       />
 
-      {/* INFO */}
       <div className="card tc-card p-3 mb-3">
         <h5 className="mb-1">{trip.title}</h5>
         <div className="text-muted">{trip.destination}</div>
@@ -70,7 +68,6 @@ const TripDetails = () => {
         </button>
       </div>
 
-      {/* ✅ ITINERARY */}
       {showItinerary && (
         <div className="itinerary-wrap">
           {trip.days?.map((day: any) => (
@@ -99,7 +96,6 @@ const TripDetails = () => {
         </div>
       )}
 
-      {/* ✅ GALERIJA */}
       {images.length > 1 && (
         <div className="trip-gallery">
           {images.slice(1).map((img: any) => {
@@ -116,7 +112,6 @@ const TripDetails = () => {
         </div>
       )}
 
-      {/* ACTIONS */}
       {isOwner && (
         <div className="d-flex gap-2 mt-4">
           <Link
@@ -134,7 +129,6 @@ const TripDetails = () => {
         </div>
       )}
 
-      {/* DELETE MODAL */}
       {showDelete && (
         <div className="modal fade show d-block">
           <div className="modal-dialog modal-dialog-centered">
@@ -171,7 +165,6 @@ const TripDetails = () => {
         </div>
       )}
 
-      {/* ✅ GALERIJA MODAL */}
       {selectedImage && (
         <div
           className="gallery-modal"

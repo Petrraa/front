@@ -24,7 +24,7 @@ interface TripCardProps {
 const TripCard = ({ trip }: TripCardProps) => {
   const { user } = useAuth();
 
-  // ✅ init iz propsa (bitno!)
+
   const [post, setPost] = useState<PostState | null>(
     trip.post_id
       ? {
@@ -44,7 +44,7 @@ const TripCard = ({ trip }: TripCardProps) => {
       setLoading(true);
       let currentPost = post;
 
-      // ✅ ako post ne postoji → kreiraj
+     
       if (!currentPost) {
         const shareRes = await shareTrip(trip.id);
         currentPost = {
@@ -55,7 +55,7 @@ const TripCard = ({ trip }: TripCardProps) => {
         setPost(currentPost);
       }
 
-      // ✅ toggle like
+      
       const likeRes = await togglePostLike(currentPost.id);
 
       setPost((prev) =>

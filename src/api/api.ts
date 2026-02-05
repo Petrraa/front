@@ -7,7 +7,7 @@ const API = axios.create({
   },
 });
 
-// ✅ AUTOMATSKI DODAJ TOKEN NA SVAKI REQUEST
+// token interceptor
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -20,7 +20,7 @@ API.interceptors.request.use((config) => {
 
 export default API;
 
-// ================= AUTH =================
+// auth
 
 export interface RegisterData {
   name: string;  
@@ -41,7 +41,7 @@ export const registerUser = (data: RegisterData) =>
 export const logoutUser = () => API.post("/auth/logout");
 
 
-// ================= TRIPS =================
+// trips
 export const getTrips = () => API.get("/trips");
 
 export const getTripById = (id: number) => API.get(`/trips/${id}`);
@@ -53,20 +53,20 @@ export const createTrip = (data: FormData) =>
 
 export const deleteTrip = (id: number) => API.delete(`/trips/${id}`);
 
-// ================= POSTS =================
+// posts
 export const getPosts = () => API.get("/posts");
 
 export const togglePostLike = (postId: number) =>
   API.post(`/posts/${postId}/like`);
 
-// ================= AI =================
+// ai
 export const applyItinerary = (payload: any) =>
   API.post("/ai/plan-and-apply", payload); 
 
 export const generateAIPlan = (payload: any) =>
   API.post("/ai/plan", payload);
 
-// ================= SHARE / FORK =================
+// share/fork
 export const forkTrip = (id: number) => API.post(`/trips/${id}/fork`);
 
 export const shareTrip = (id: number) => API.post(`/posts`, { trip_id: id });

@@ -29,7 +29,7 @@ const Register = () => {
     try {
       await register({
         name,
-        username, // ✅ OBAVEZNO
+        username, 
         email,
         password,
         password_confirmation: passwordConfirmation,

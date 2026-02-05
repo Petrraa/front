@@ -18,7 +18,6 @@ const Home = () => {
         const res = await getTrips();
         const allTrips = res.data.trips ?? res.data ?? [];
 
-        // ✅ SAMO TUĐI PUBLIC TRIPOVI
         const publicTrips = allTrips.filter(
           (trip: any) =>
             trip.is_public && trip.user_id !== user?.id
@@ -48,13 +47,11 @@ const Home = () => {
 
   return (
     <div className="tc-screen">
-      {/* WELCOME */}
       <div className="home-welcome">
         <small>Welcome back</small>
         <h5>{user?.name}</h5>
       </div>
 
-      {/* AI CTA */}
       <div className="home-ai-card mb-4">
         <strong>AI Travel Assistant</strong>
         <p>Answer a few questions and get a recommendation.</p>
@@ -66,7 +63,6 @@ const Home = () => {
         </button>
       </div>
 
-      {/* RECOMMENDED */}
       <div className="section-header">
         <strong>Recommended</strong>
         <span
@@ -83,7 +79,6 @@ const Home = () => {
         <div className="empty-state">No trips yet.</div>
       )}
 
-      {/* POPULAR */}
       <div className="section-header">
         <strong>Popular</strong>
       </div>

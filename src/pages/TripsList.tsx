@@ -18,7 +18,6 @@ const TripsList = () => {
         const res = await getTrips();
         const allTrips = res.data.trips ?? res.data ?? [];
 
-        // ✅ SAMO TUĐI PUBLIC TRIPOVI
         const publicTrips = allTrips.filter(
           (trip: any) =>
             trip.is_public && trip.user_id !== user?.id
@@ -41,7 +40,6 @@ const TripsList = () => {
 
   return (
     <div className="tc-screen">
-      {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">Trips</h5>
 

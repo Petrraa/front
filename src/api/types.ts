@@ -6,5 +6,5 @@ export interface TripData {
   description: string;
   price: number;
   date: string;
-  image?: string; // ✅ putanja slike s backenda
+  image?: string; 
 }

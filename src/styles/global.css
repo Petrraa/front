@@ -22,10 +22,7 @@ body {
   justify-content: center;
 }
 
-/* =========================
-   TRIP DETAILS – GALLERY (MOCKUP)
-========================= */
-
+/* gallery*/
 .trip-gallery {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -42,7 +39,7 @@ body {
   margin-top: 12px;
 }
 
-/* Itinerary container (kad se otvori) */
+/* Itinerary container */
 .itinerary-box {
   margin-top: 16px;
 }

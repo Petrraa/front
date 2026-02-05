@@ -24,7 +24,7 @@ const AI = () => {
   const [chosenDestination, setChosenDestination] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ AI bira destinaciju
+  
   const pickDestination = (): string => {
     if (experience === "adventure") return "Lisbon";
     if (likesNightlife && companion === "friends") return "Barcelona";

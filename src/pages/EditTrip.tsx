@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../api/api";
 
-/* ✅ EMOJI MAPA – koristi se samo kod dodavanja aktivnosti */
 const typeEmoji = (type: string) => {
   switch (type) {
     case "food":
@@ -24,17 +23,15 @@ const EditTrip = () => {
   const [trip, setTrip] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // BASIC INFO
+
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("");
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState<number | null>(null);
   const [isPublic, setIsPublic] = useState(false);
 
-  // ✅ GALERIJA – VRAĆENO
   const [newImages, setNewImages] = useState<File[]>([]);
 
-  // ITINERARY INPUTS
   const [newItemTitle, setNewItemTitle] = useState("");
   const [newItemTime, setNewItemTime] = useState("09:00");
   const [newItemType, setNewItemType] = useState("activity");
@@ -55,7 +52,6 @@ const EditTrip = () => {
     })();
   }, [tripId]);
 
-  /* ✅ ADD DAY */
   const addDay = async () => {
     const nextDayIndex =
       trip?.days && trip.days.length > 0
@@ -70,14 +66,12 @@ const EditTrip = () => {
     setTrip(refreshed.data.trip);
   };
 
-  /* ✅ DELETE DAY */
   const deleteDay = async (dayId: number) => {
     await API.delete(`/days/${dayId}`);
     const refreshed = await API.get(`/trips/${tripId}`);
     setTrip(refreshed.data.trip);
   };
 
-  /* ✅ ADD ACTIVITY – emoji se dodaje u title */
   const addActivity = async (dayId: number) => {
     if (!newItemTitle.trim()) return;
 
@@ -98,14 +92,12 @@ const EditTrip = () => {
     setTrip(refreshed.data.trip);
   };
 
-  /* ✅ DELETE ACTIVITY */
   const deleteActivity = async (itemId: number) => {
     await API.delete(`/items/${itemId}`);
     const refreshed = await API.get(`/trips/${tripId}`);
     setTrip(refreshed.data.trip);
   };
 
-  /* ✅ SAVE TRIP – S UKLJUČENIM FOTOGRAFIJAMA */
   const saveTrip = async () => {
     const formData = new FormData();
     formData.append("title", title);
@@ -114,7 +106,6 @@ const EditTrip = () => {
     if (budget !== null) formData.append("budget", String(budget));
     formData.append("is_public", isPublic ? "1" : "0");
 
-    // ✅ GALERIJA – upload
     newImages.forEach((img) => {
       if (img.size <= 2 * 1024 * 1024) {
         formData.append("images[]", img);
@@ -134,7 +125,6 @@ const EditTrip = () => {
     <div className="tc-screen">
       <h5 className="mb-3">Edit trip</h5>
 
-      {/* BASIC INFO */}
       <div className="card tc-card p-3 mb-4">
         <input
           className="form-control mb-2"
@@ -167,7 +157,6 @@ const EditTrip = () => {
           placeholder="Budget"
         />
 
-        {/* ✅ UPLOAD FOTOGRAFIJA – VRAĆENO */}
         <label className="form-label">Add more photos</label>
         <input
           type="file"
@@ -190,7 +179,6 @@ const EditTrip = () => {
         </div>
       </div>
 
-      {/* ITINERARY */}
       <div className="itinerary-wrap">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <strong>Itinerary</strong>
@@ -230,7 +218,6 @@ const EditTrip = () => {
               </div>
             ))}
 
-            {/* ADD ACTIVITY */}
             <div className="add-activity">
               <input
                 className="form-control"

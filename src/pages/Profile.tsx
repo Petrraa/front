@@ -18,7 +18,6 @@ const Profile = () => {
 
     const fetchData = async () => {
       try {
-        // ✅ My trips
         const tripsRes = await getTrips();
         const trips = tripsRes.data.trips ?? tripsRes.data ?? [];
         const onlyMyTrips = trips.filter(
@@ -27,7 +26,6 @@ const Profile = () => {
 
         setMyTrips(onlyMyTrips);
 
-        // ✅ Liked trips (preko posts)
         const postsRes = await getPosts();
         const posts = postsRes.data.posts ?? postsRes.data ?? [];
         const liked = posts
@@ -51,7 +49,6 @@ const Profile = () => {
 
   return (
     <div className="tc-screen">
-      {/* HEADER */}
       <div className="mb-3">
         <h5 className="mb-0">{user?.name}</h5>
         <div className="text-muted" style={{ fontSize: 13 }}>
@@ -59,7 +56,6 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* TABS */}
       <div className="profile-tabs">
         <button
           className={`profile-tab ${
@@ -80,7 +76,6 @@ const Profile = () => {
         </button>
       </div>
 
-      {/* CONTENT */}
       {loading && <div className="text-muted">Loading…</div>}
 
       {!loading && activeTab === "my" && (
@@ -117,7 +112,6 @@ const Profile = () => {
         </>
       )}
 
-      {/* LOGOUT */}
       <button
         className="btn btn-outline-danger w-100 mt-4"
         onClick={logout}

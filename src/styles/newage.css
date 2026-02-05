@@ -3,7 +3,6 @@
   --tc-bg: #e1e1e4;
 }
 
-/* GLOBAL */
 body {
   margin: 0;
   background-color: var(--tc-bg);
@@ -11,7 +10,7 @@ body {
     Roboto, Ubuntu, "Helvetica Neue", sans-serif;
 }
 
-/* APP CONTAINER */
+/* app container */
 .tc-app {
   max-width: 520px;
   margin: 0 auto;
@@ -19,12 +18,11 @@ body {
   padding-bottom: 72px;
 }
 
-/* PAGE */
 .tc-screen {
   padding: 16px;
 }
 
-/* CARD */
+/* card */
 .tc-card {
   background: #fff;
   border-radius: 18px;
@@ -32,7 +30,7 @@ body {
   padding: 16px;
 }
 
-/* IMAGE CARD */
+/* image card */
 .tc-img {
   height: 150px;
   border-radius: 16px;
@@ -41,19 +39,19 @@ body {
   background-position: center;
 }
 
-/* BUTTONS */
+
 button,
 .btn {
   border-radius: 999px;
 }
 
-/* LINKS */
+
 a {
   text-decoration: none;
   color: var(--tc-primary);
 }
 
-/* BOTTOM NAV FIX */
+/* bottom nav */
 nav a {
   color: #6c757d;
 }
@@ -62,11 +60,8 @@ nav a.active {
   color: var(--tc-primary);
 }
 
-/* =========================
-   AUTH (LOGIN / REGISTER)
-========================= */
 
-/* Background like mockup (city + blur) */
+/* background */
 .auth-bg {
   min-height: 100vh;
   background: linear-gradient(
@@ -83,7 +78,6 @@ nav a.active {
   padding: 16px;
 }
 
-/* Card */
 .auth-card {
   width: 100%;
   max-width: 340px;
@@ -94,29 +88,24 @@ nav a.active {
   text-align: center;
 }
 
-/* Small logo like mockup */
+/* logo */
 .auth-logo {
-  width: 90px;       /* ✅ MALO */
+  width: 90px;       
   margin-bottom: 12px;
 }
 
-/* Inputs spacing */
 .auth-card .form-control {
   border-radius: 12px;
   padding: 10px 12px;
 }
 
-/* Primary button */
+/* primary button */
 .auth-card .btn-primary {
   border-radius: 14px;
   padding: 10px;
 }
 
-/* =========================
-   HOME POLISH (MOCKUP STYLE)
-========================= */
 
-/* Welcome text */
 .home-welcome {
   margin-bottom: 20px;
 }
@@ -130,7 +119,7 @@ nav a.active {
   font-weight: 600;
 }
 
-/* AI card polish */
+/* ai card */
 .home-ai-card {
   border-radius: 22px;
   padding: 22px;
@@ -151,7 +140,6 @@ nav a.active {
   font-weight: 500;
 }
 
-/* Section headers */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -170,13 +158,11 @@ nav a.active {
   cursor: pointer;
 }
 
-/* Empty state */
 .empty-state {
   color: #6c757d;
   font-size: 14px;
 }
 
-/* Popular horizontal scroll */
 .popular-scroll {
   display: flex;
   gap: 14px;
@@ -188,9 +174,6 @@ nav a.active {
   min-width: 190px;
 }
 
-/* =========================
-   PROFILE POLISH
-========================= */
 
 .profile-header {
   margin-bottom: 24px;
@@ -206,7 +189,6 @@ nav a.active {
   color: #6c757d;
 }
 
-/* Section spacing */
 .profile-section {
   margin-bottom: 28px;
 }
@@ -216,7 +198,6 @@ nav a.active {
   font-weight: 600;
 }
 
-/* Visited grid */
 .visited-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -228,14 +209,9 @@ nav a.active {
   height: 120px;
 }
 
-/* Logout button */
 .profile-logout {
   margin-top: 24px;
 }
-
-/* =========================
-   TRIP CARD POLISH
-========================= */
 
 .trip-card {
   overflow: hidden;
@@ -269,10 +245,6 @@ nav a.active {
   color: #6c757d;
 }
 
-/* =========================
-   TRIP DETAILS GALLERY
-========================= */
-
 .trip-hero {
   width: 100%;
   height: 220px;
@@ -293,9 +265,6 @@ nav a.active {
   height: 120px;
 }
 
-/* =========================
-   CREATE TRIP POLISH
-========================= */
 
 .image-preview {
   width: 100%;
@@ -306,9 +275,6 @@ nav a.active {
   margin-bottom: 12px;
 }
 
-/* =========================
-   TRIP DETAILS – ITINERARY
-========================= */
 
 .itinerary-section {
   margin-top: 28px;
@@ -346,9 +312,6 @@ nav a.active {
   color: #6c757d;
 }
 
-/* =========================
-   ITINERARY – DAY CARDS
-========================= */
 
 .itinerary-wrap {
   margin-top: 16px;
@@ -405,9 +368,6 @@ nav a.active {
   gap: 8px;
 }
 
-/* =========================
-   ITINERARY – TIMELINE STYLE
-========================= */
 
 .itinerary-section {
   margin-top: 28px;
@@ -426,7 +386,6 @@ nav a.active {
   margin-bottom: 12px;
 }
 
-/* Timeline */
 .itinerary-timeline {
   position: relative;
   padding-left: 20px;
@@ -465,14 +424,10 @@ nav a.active {
   color: #6c757d;
 }
 
-/* Emoji icons */
 .itinerary-emoji {
   margin-right: 4px;
 }
 
-/* =========================
-   LIKED TRIP CARD
-========================= */
 
 .trip-card.liked {
   box-shadow: 0 14px 40px rgba(255, 0, 0, 0.15);
@@ -490,9 +445,6 @@ nav a.active {
   border-radius: 999px;
 }
 
-/* =========================
-   PROFILE TABS
-========================= */
 
 .profile-tabs {
   display: flex;
@@ -516,9 +468,6 @@ nav a.active {
   border-color: var(--tc-primary);
 }
 
-/* =========================
-   GALLERY IMPROVEMENTS
-========================= */
 
 .trip-gallery {
   display: grid;
@@ -539,9 +488,6 @@ nav a.active {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
 
-/* =========================
-   GALLERY MODAL
-========================= */
 
 .gallery-modal {
   position: fixed;

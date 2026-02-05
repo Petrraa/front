@@ -16,7 +16,6 @@ const CreateTrip = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
 
-  // ✅ NOVO: galerija
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -39,20 +38,17 @@ const CreateTrip = () => {
     try {
       const formData = new FormData();
 
-      // ✅ OBAVEZNA POLJA
+
       formData.append("title", title);
       formData.append("destination", destination);
       formData.append("start_date", startDate);
 
-      // ✅ OPCIONALNA
       formData.append("description", description);
       if (budget !== null) formData.append("budget", String(budget));
       formData.append("is_public", isPublic ? "1" : "0");
 
-      // ✅ COVER SLIKA (postojeće)
       if (image) formData.append("image", image);
 
-      // ✅ GALERIJA (novo)
       galleryImages.forEach((img) => {
         if (img.size > 2 * 1024 * 1024) {
           throw new Error("Each gallery image must be smaller than 2 MB.");
@@ -129,7 +125,6 @@ const CreateTrip = () => {
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        {/* ✅ POSTOJEĆI COVER PREVIEW */}
         {image && (
           <div
             className="image-preview"
@@ -139,7 +134,6 @@ const CreateTrip = () => {
           />
         )}
 
-        {/* ✅ POSTOJEĆI COVER UPLOAD */}
         <input
           type="file"
           accept="image/*"
@@ -160,7 +154,6 @@ const CreateTrip = () => {
           }}
         />
 
-        {/* ✅ NOVO: GALERIJA UPLOAD */}
         <label className="form-label">Gallery images</label>
         <input
           type="file"
