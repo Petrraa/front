@@ -70,7 +70,7 @@ const AI = () => {
         {!plan && (
           <>
             <div className="ai-header">
-              <span className="ai-badge">✨ AI Assistant</span>
+              <span className="ai-badge">AI Assistant</span>
               <h5>Tell us about your trip</h5>
             </div>
 
@@ -172,8 +172,10 @@ const AI = () => {
         {plan && chosenDestination && (
           <>
             <div className="ai-header">
-              <span className="ai-badge">✨ AI Result</span>
-              <h4>{chosenDestination}</h4>
+              <span className="ai-badge">AI Result</span>
+              <h4 className="ai-reveal">
+                {chosenDestination}
+              </h4>
             </div>
 
             {plan.days.map((day: any) => (

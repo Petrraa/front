@@ -38,17 +38,20 @@ const CreateTrip = () => {
     try {
       const formData = new FormData();
 
-
+      // ✅ BASIC INFO
       formData.append("title", title);
       formData.append("destination", destination);
       formData.append("start_date", startDate);
 
+      // ✅ OPTIONAL
       formData.append("description", description);
       if (budget !== null) formData.append("budget", String(budget));
       formData.append("is_public", isPublic ? "1" : "0");
 
+      // ✅ COVER IMAGE
       if (image) formData.append("image", image);
 
+      // ✅ GALLERY
       galleryImages.forEach((img) => {
         if (img.size > 2 * 1024 * 1024) {
           throw new Error("Each gallery image must be smaller than 2 MB.");
@@ -81,8 +84,11 @@ const CreateTrip = () => {
         </div>
       )}
 
-      <form className="card tc-card p-3" onSubmit={handleSubmit}>
+      <form className="card tc-card create-card" onSubmit={handleSubmit}>
         {error && <div className="alert alert-danger">{error}</div>}
+
+        {/* ===== BASIC INFORMATION ===== */}
+        <h6 className="form-section-title">Basic information</h6>
 
         <input
           className="form-control mb-2"
@@ -125,6 +131,9 @@ const CreateTrip = () => {
           onChange={(e) => setDescription(e.target.value)}
         />
 
+        {/* ===== COVER IMAGE ===== */}
+        <h6 className="form-section-title">Cover image</h6>
+
         {image && (
           <div
             className="image-preview"
@@ -154,21 +163,27 @@ const CreateTrip = () => {
           }}
         />
 
-        <label className="form-label">Gallery images</label>
+        {/* ===== GALLERY ===== */}
+        <h6 className="form-section-title">Gallery</h6>
+
         <input
           type="file"
           multiple
           accept="image/*"
-          className="form-control mb-3"
+          className="form-control mb-2"
           onChange={(e) =>
             setGalleryImages(Array.from(e.target.files ?? []))
           }
         />
+
         <small className="text-muted">
           You can add multiple images (max 2 MB each).
         </small>
 
-        <div className="form-check mb-3 mt-3">
+        {/* ===== VISIBILITY ===== */}
+        <h6 className="form-section-title">Visibility</h6>
+
+        <div className="form-check mb-3 mt-2">
           <input
             type="checkbox"
             className="form-check-input"
@@ -178,8 +193,12 @@ const CreateTrip = () => {
           <label className="form-check-label">Public</label>
         </div>
 
-        <button className="btn btn-primary tc-pill w-100" disabled={loading}>
-          {loading ? "Creating..." : "Create"}
+        {/* ===== CREATE BUTTON ===== */}
+        <button
+          className="btn create-trip-btn w-100"
+          disabled={loading}
+        >
+          {loading ? "Creating..." : "Create trip"}
         </button>
       </form>
     </div>

@@ -40,14 +40,14 @@ const TripsList = () => {
 
   return (
     <div className="tc-screen">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Trips</h5>
+      <div className="trips-header">
+        <h5 className="trips-title">Trips</h5>
 
         <button
-          className="btn btn-primary tc-pill"
+          className="btn new-trip-btn"
           onClick={() => navigate("/trips/create")}
         >
-          + New trip
+          ✈️ New trip
         </button>
       </div>
 

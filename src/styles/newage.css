@@ -63,19 +63,25 @@ nav a.active {
 
 /* background */
 .auth-bg {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0; 
+  width: 100vw;
+  height: 100vh;
+
   background: linear-gradient(
       rgba(11, 58, 91, 0.45),
       rgba(11, 58, 91, 0.45)
     ),
-    url("https://plus.unsplash.com/premium_photo-1679830513869-cd3648acb1db?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHRyYXZlbHxlbnwwfHwwfHx8MA%3D%3D");
+    url("https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=1200&auto=format&fit=crop&q=60");
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+
+  z-index: 9999;
 }
 
 .auth-card {
@@ -795,7 +801,7 @@ nav a.active {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
   border-radius: 26px;
-  box-shadow: 0 16px 40px rgba(17, 57, 203, 0.5);
+  box-shadow: 0 16px 40px rgba(116, 191, 238, 0.758);
 }
 
 .ai-header {
@@ -845,13 +851,13 @@ nav a.active {
   font-weight: 600;
   border-radius: 999px;
   padding: 14px;
-  box-shadow: 0 16px 40px rgba(17, 57, 203, 0.5);
+  box-shadow: 0 16px 40px rgba(116, 191, 238, 0.758);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ai-cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 40px rgba(17, 57, 203, 0.5);
+  box-shadow: 0 16px 40px rgba(116, 191, 238, 0.758);
 }
 
 .ai-day {
@@ -860,4 +866,130 @@ nav a.active {
 
 .ai-day ul {
   padding-left: 18px;
+}
+
+/* ===== AI DESTINATION REVEAL ===== */
+
+.ai-reveal {
+  animation: reveal 0.6s ease forwards;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== TRIPS HEADER ===== */
+
+.trips-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.trips-title {
+  position: relative;
+  font-weight: 600;
+}
+
+/* gradient underline */
+.trips-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 32px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+}
+
+/* new trip button */
+.new-trip-btn {
+  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+  color: white;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 999px;
+  box-shadow: 0 16px 40px rgba(116, 191, 238, 0.758);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.new-trip-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:0 16px 40px rgba(116, 191, 238, 0.758);
+}
+
+/* ===== CREATE TRIP REDESIGN ===== */
+
+.create-card {
+  padding: 24px;
+  border-radius: 26px;
+}
+
+/* section titles */
+.form-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6c757d;
+  margin: 18px 0 10px;
+}
+
+/* inputs polish */
+.create-card .form-control,
+.create-card .form-select {
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid #dee2e6;
+}
+
+.create-card .form-control:focus,
+.create-card .form-select:focus {
+  border-color: #111acb;
+  box-shadow: 0 16px 40px rgba(116, 191, 238, 0.758);
+}
+
+/* file inputs */
+.create-card input[type="file"] {
+  border-radius: 14px;
+  padding: 10px;
+  background: #f8f9fb;
+}
+
+/* checkbox polish */
+.create-card .form-check {
+  margin-top: 12px;
+}
+
+.create-card .form-check-input {
+  cursor: pointer;
+}
+
+/* create button */
+.create-trip-btn {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+  color: white;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 999px;
+  box-shadow:0 16px 40px rgba(116, 191, 238, 0.758);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.create-trip-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:0 16px 40px rgba(116, 191, 238, 0.758);
+}
+
+/* small helper text */
+.create-card small.text-muted {
+  font-size: 12px;
 }
