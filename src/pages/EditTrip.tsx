@@ -23,12 +23,13 @@ const EditTrip = () => {
   const [trip, setTrip] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-
   const [title, setTitle] = useState("");
   const [destination, setDestination] = useState("");
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState<number | null>(null);
   const [isPublic, setIsPublic] = useState(false);
+
+  const [coverImage, setCoverImage] = useState<File | null>(null);
 
   const [newImages, setNewImages] = useState<File[]>([]);
 
@@ -106,6 +107,10 @@ const EditTrip = () => {
     if (budget !== null) formData.append("budget", String(budget));
     formData.append("is_public", isPublic ? "1" : "0");
 
+    if (coverImage) {
+      formData.append("image", coverImage);
+    }
+
     newImages.forEach((img) => {
       if (img.size <= 2 * 1024 * 1024) {
         formData.append("images[]", img);
@@ -155,6 +160,42 @@ const EditTrip = () => {
             setBudget(e.target.value ? Number(e.target.value) : null)
           }
           placeholder="Budget"
+        />
+
+        {trip.image && !coverImage && (
+          <div
+            className="image-preview"
+            style={{
+              backgroundImage: `url(http://localhost:8000/storage/${trip.image})`,
+            }}
+          />
+        )}
+
+        {coverImage && (
+          <div
+            className="image-preview"
+            style={{
+              backgroundImage: `url(${URL.createObjectURL(coverImage)})`,
+            }}
+          />
+        )}
+
+        <label className="form-label">Change cover image</label>
+        <input
+          type="file"
+          accept="image/*"
+          className="form-control mb-3"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+              alert("Image must be smaller than 2 MB.");
+              return;
+            }
+
+            setCoverImage(file);
+          }}
         />
 
         <label className="form-label">Add more photos</label>

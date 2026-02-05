@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getTripById, deleteTrip } from "../api/api";
+import { getTripById, deleteTrip, forkTrip } from "../api/api";
 import { useAuth } from "../context/AuthContext";
 
 const FALLBACK_IMAGE =
@@ -17,6 +17,9 @@ const TripDetails = () => {
   const [showItinerary, setShowItinerary] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const [forking, setForking] = useState(false);
+  const [forkError, setForkError] = useState("");
+
   useEffect(() => {
     if (!id) return;
 
@@ -31,6 +34,26 @@ const TripDetails = () => {
   if (!trip) return <div className="tc-screen">Trip not found.</div>;
 
   const isOwner = user?.id === trip.user_id;
+
+  const handleFork = async () => {
+    if (!trip || forking) return;
+
+    try {
+      setForking(true);
+      setForkError("");
+
+      const res = await forkTrip(trip.id);
+      const newTripId = res.data.trip.id;
+
+      navigate(`/trips/${newTripId}`);
+    } catch (err: any) {
+      setForkError(
+        err.response?.data?.message || "Fork failed"
+      );
+    } finally {
+      setForking(false);
+    }
+  };
 
   const heroImage = trip.image
     ? `http://localhost:8000/storage/${trip.image}`
@@ -73,7 +96,6 @@ const TripDetails = () => {
           {trip.days?.map((day: any) => (
             <div key={day.id} className="day-card">
               <div className="day-card-header">
-                {/* ✅ FIX: samo jednom Day */}
                 <strong>Day {day.day_index}</strong>
               </div>
 
@@ -112,22 +134,43 @@ const TripDetails = () => {
         </div>
       )}
 
-      {isOwner && (
-        <div className="d-flex gap-2 mt-4">
-          <Link
-            to={`/trips/edit/${trip.id}`}
-            className="btn btn-outline-primary tc-pill w-100"
-          >
-            Edit
-          </Link>
-          <button
-            className="btn btn-danger tc-pill w-100"
-            onClick={() => setShowDelete(true)}
-          >
-            Delete
-          </button>
-        </div>
-      )}
+      <div className="mt-4">
+        {isOwner && (
+          <div className="d-flex gap-2">
+            <Link
+              to={`/trips/edit/${trip.id}`}
+              className="btn btn-outline-primary tc-pill w-100"
+            >
+              Edit
+            </Link>
+
+            <button
+              className="btn btn-danger tc-pill w-100"
+              onClick={() => setShowDelete(true)}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+
+        {!isOwner && trip.is_public && (
+          <div className="mt-3">
+            <button
+              className="btn btn-outline-success tc-pill w-100"
+              onClick={handleFork}
+              disabled={forking}
+            >
+              {forking ? "Forking..." : "Fork this trip"}
+            </button>
+
+            {forkError && (
+              <div className="text-danger mt-2" style={{ fontSize: 13 }}>
+                {forkError}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {showDelete && (
         <div className="modal fade show d-block">
