@@ -24,7 +24,6 @@ const AI = () => {
   const [chosenDestination, setChosenDestination] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  
   const pickDestination = (): string => {
     if (experience === "adventure") return "Lisbon";
     if (likesNightlife && companion === "friends") return "Barcelona";
@@ -46,7 +45,6 @@ const AI = () => {
 
   const handleGenerate = async () => {
     setLoading(true);
-
     const destination = pickDestination();
     setChosenDestination(destination);
 
@@ -57,11 +55,9 @@ const AI = () => {
         pace,
         interests: buildInterests(),
       };
-
       const res = await generateAIPlan(payload);
       setPlan(res.data.plan);
-    } catch (err: any) {
-      console.error("AI ERROR:", err.response?.data);
+    } catch {
       alert("AI trenutno nije dostupan. Pokušaj ponovo.");
     } finally {
       setLoading(false);
@@ -70,154 +66,145 @@ const AI = () => {
 
   return (
     <div className="tc-screen">
-      <h5 className="mb-3">AI Travel Assistant</h5>
+      <div className="ai-card tc-card">
+        {!plan && (
+          <>
+            <div className="ai-header">
+              <span className="ai-badge">✨ AI Assistant</span>
+              <h5>Tell us about your trip</h5>
+            </div>
 
-      {!plan && (
-        <div className="card tc-card p-3">
-          <h6 className="fw-semibold mb-2">
-            Tell us about your trip
-          </h6>
+            <label className="form-label">How many days?</label>
+            <input
+              type="range"
+              min={3}
+              max={10}
+              value={days}
+              onChange={(e) => setDays(Number(e.target.value))}
+              className="form-range mb-2"
+            />
+            <div className="ai-range-value">{days} days</div>
 
-          <label className="form-label">How many days?</label>
-          <input
-            type="range"
-            min={3}
-            max={10}
-            value={days}
-            onChange={(e) => setDays(Number(e.target.value))}
-            className="form-range mb-2"
-          />
-          <div className="text-muted mb-2">{days} days</div>
+            <label className="form-label">Pace</label>
+            <select
+              className="form-select mb-2"
+              value={pace}
+              onChange={(e) => setPace(e.target.value as Pace)}
+            >
+              <option value="lagano">Relaxed</option>
+              <option value="normalno">Normal</option>
+              <option value="brzo">Active</option>
+            </select>
 
-          <label className="form-label">Pace</label>
-          <select
-            className="form-select mb-2"
-            value={pace}
-            onChange={(e) => setPace(e.target.value as Pace)}
-          >
-            <option value="lagano">Relaxed</option>
-            <option value="normalno">Normal</option>
-            <option value="brzo">Active</option>
-          </select>
+            <label className="form-label">Budget</label>
+            <select
+              className="form-select mb-2"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value as Budget)}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
 
-          <label className="form-label">Budget</label>
-          <select
-            className="form-select mb-2"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value as Budget)}
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
+            <label className="form-label">Who are you traveling with?</label>
+            <select
+              className="form-select mb-2"
+              value={companion}
+              onChange={(e) => setCompanion(e.target.value as Companion)}
+            >
+              <option value="solo">Solo</option>
+              <option value="partner">Partner</option>
+              <option value="friends">Friends</option>
+              <option value="family">Family</option>
+            </select>
 
-          <label className="form-label">Who are you traveling with?</label>
-          <select
-            className="form-select mb-2"
-            value={companion}
-            onChange={(e) => setCompanion(e.target.value as Companion)}
-          >
-            <option value="solo">Solo</option>
-            <option value="partner">Partner</option>
-            <option value="friends">Friends</option>
-            <option value="family">Family</option>
-          </select>
+            <label className="form-label">What do you want most?</label>
+            <select
+              className="form-select mb-3"
+              value={experience}
+              onChange={(e) => setExperience(e.target.value as Experience)}
+            >
+              <option value="relax">Relax</option>
+              <option value="culture">Culture</option>
+              <option value="adventure">Adventure</option>
+              <option value="party">Party</option>
+            </select>
 
-          <label className="form-label">What do you want most?</label>
-          <select
-            className="form-select mb-3"
-            value={experience}
-            onChange={(e) => setExperience(e.target.value as Experience)}
-          >
-            <option value="relax">Relax</option>
-            <option value="culture">Culture</option>
-            <option value="adventure">Adventure</option>
-            <option value="party">Party</option>
-          </select>
-
-          <label className="form-label">Interests</label>
-          <div className="mb-3">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="likesFood"
-                checked={likesFood}
-                onChange={(e) => setLikesFood(e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="likesFood">
+            <label className="form-label">Interests</label>
+            <div className="ai-interests mb-3">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={likesFood}
+                  onChange={(e) => setLikesFood(e.target.checked)}
+                />
                 Food & Dining
               </label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="likesNature"
-                checked={likesNature}
-                onChange={(e) => setLikesNature(e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="likesNature">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={likesNature}
+                  onChange={(e) => setLikesNature(e.target.checked)}
+                />
                 Nature & Outdoors
               </label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="likesNightlife"
-                checked={likesNightlife}
-                onChange={(e) => setLikesNightlife(e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="likesNightlife">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={likesNightlife}
+                  onChange={(e) => setLikesNightlife(e.target.checked)}
+                />
                 Nightlife
               </label>
             </div>
-          </div>
 
-          <button
-            className="btn btn-primary tc-pill w-100"
-            onClick={handleGenerate}
-            disabled={loading}
-          >
-            {loading ? "AI is thinking..." : "Let AI choose my destination"}
-          </button>
-        </div>
-      )}
+            <button
+              className="btn ai-cta w-100"
+              onClick={handleGenerate}
+              disabled={loading}
+            >
+              {loading ? "AI is thinking..." : "Let AI choose my destination"}
+            </button>
+          </>
+        )}
 
-      {plan && chosenDestination && (
-        <div className="card tc-card p-3">
-          <h6 className="fw-semibold mb-2">AI chose destination:</h6>
-          <h4 className="mb-2">{chosenDestination}</h4>
-
-          {plan.days.map((day: any) => (
-            <div key={day.day} className="mb-3">
-              <strong>Day {day.day}</strong>
-              <ul>
-                {day.items.map((item: any, idx: number) => (
-                  <li key={idx}>
-                    <strong>{item.time}</strong> – {item.title}
-                  </li>
-                ))}
-              </ul>
+        {plan && chosenDestination && (
+          <>
+            <div className="ai-header">
+              <span className="ai-badge">✨ AI Result</span>
+              <h4>{chosenDestination}</h4>
             </div>
-          ))}
 
-          <button
-            className="btn btn-success tc-pill w-100"
-            onClick={() =>
-              navigate("/trips/create", {
-                state: {
-                  destination: chosenDestination,
-                  aiGenerated: true,
-                },
-              })
-            }
-          >
-            Create trip from this AI plan
-          </button>
-        </div>
-      )}
+            {plan.days.map((day: any) => (
+              <div key={day.day} className="ai-day">
+                <strong>Day {day.day}</strong>
+                <ul>
+                  {day.items.map((item: any, idx: number) => (
+                    <li key={idx}>
+                      <strong>{item.time}</strong> – {item.title}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+
+            <button
+              className="btn ai-cta w-100 mt-3"
+              onClick={() =>
+                navigate("/trips/create", {
+                  state: {
+                    destination: chosenDestination,
+                    aiGenerated: true,
+                  },
+                })
+              }
+            >
+              Create trip from this AI plan
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

@@ -18,12 +18,12 @@ interface TripCardProps {
     post_id?: number;
     likes_count?: number;
     liked?: boolean;
+    is_public?: boolean;
   };
 }
 
 const TripCard = ({ trip }: TripCardProps) => {
   const { user } = useAuth();
-
 
   const [post, setPost] = useState<PostState | null>(
     trip.post_id
@@ -37,14 +37,18 @@ const TripCard = ({ trip }: TripCardProps) => {
 
   const [loading, setLoading] = useState(false);
 
-  const handleLike = async () => {
+  const handleLike = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!user || loading || trip.user_id === user.id || !trip.id) return;
 
     try {
       setLoading(true);
       let currentPost = post;
 
-     
       if (!currentPost) {
         const shareRes = await shareTrip(trip.id);
         currentPost = {
@@ -55,7 +59,6 @@ const TripCard = ({ trip }: TripCardProps) => {
         setPost(currentPost);
       }
 
-      
       const likeRes = await togglePostLike(currentPost.id);
 
       setPost((prev) =>
@@ -69,8 +72,6 @@ const TripCard = ({ trip }: TripCardProps) => {
             }
           : prev
       );
-    } catch (err) {
-      console.error("LIKE ERROR", err);
     } finally {
       setLoading(false);
     }
@@ -80,40 +81,39 @@ const TripCard = ({ trip }: TripCardProps) => {
     ? `http://localhost:8000/storage/${trip.image}`
     : FALLBACK_IMAGE;
 
-  const isLiked = post?.liked ?? false;
-  const likesCount = post?.likes_count ?? 0;
-  const isOwner = trip.user_id === user?.id;
-
   return (
-    <div className="card tc-card h-100">
-      <Link to={`/trips/${trip.id}`} className="text-decoration-none text-dark">
+    <Link to={`/trips/${trip.id}`} className="trip-card-link">
+      <div className="trip-card instagram-card">
         <div
-          className="tc-img"
+          className="trip-card-image-full"
           style={{ backgroundImage: `url(${imageUrl})` }}
-        />
-        <div className="p-2">
-          <div className="fw-semibold">{trip.title}</div>
-          <div className="text-muted" style={{ fontSize: 13 }}>
-            {trip.destination}
+        >
+
+          {user && trip.user_id !== user.id && (
+            <button
+              className={`like-btn ${post?.liked ? "liked" : ""}`}
+              onClick={handleLike}
+            >
+              {post?.liked ? "❤️" : "🤍"}
+            </button>
+          )}
+
+          <div className="trip-card-overlay">
+            <h6>{trip.title}</h6>
+            <small>{trip.destination}</small>
           </div>
         </div>
-      </Link>
 
-      {user && !isOwner && (
-        <div className="d-flex justify-content-between align-items-center px-2 pb-2">
-          <button
-            className="btn btn-sm btn-light"
-            onClick={handleLike}
-            disabled={loading}
-          >
-            {isLiked ? "❤️" : "🤍"} {likesCount}
-          </button>
-          <span className="text-muted" style={{ fontSize: 12 }}>
-            {isLiked ? "Liked" : "Click to like"}
+        <div className="trip-card-footer">
+          <span>
+            {post?.likes_count ?? 0} likes
+          </span>
+          <span className="text-muted">
+            {trip.is_public ? "Public" : "Private"}
           </span>
         </div>
-      )}
-    </div>
+      </div>
+    </Link>
   );
 };
 

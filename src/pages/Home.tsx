@@ -47,9 +47,18 @@ const Home = () => {
 
   return (
     <div className="tc-screen">
-      <div className="home-welcome">
-        <small>Welcome back</small>
-        <h5>{user?.name}</h5>
+      <div className="home-header">
+        <div className="home-welcome">
+          <small>Welcome back</small>
+          <h5>{user?.name}</h5>
+        </div>
+
+        <div
+          className="home-avatar"
+          onClick={() => navigate("/profile")}
+        >
+          {user?.name?.charAt(0).toUpperCase()}
+        </div>
       </div>
 
       <div className="home-ai-card mb-4">
@@ -64,38 +73,28 @@ const Home = () => {
       </div>
 
       <div className="section-header">
-        <strong>Recommended</strong>
-        <span
-          className="see-all"
-          onClick={() => navigate("/trips")}
-        >
-          See all
-        </span>
+        <strong>Recommended for you</strong>
       </div>
 
       {recommended ? (
         <TripCard trip={recommended} />
       ) : (
-        <div className="empty-state">No trips yet.</div>
+        <div className="empty-state">No trips yet ✨</div>
       )}
 
       <div className="section-header">
         <strong>Popular</strong>
       </div>
 
-      {popular.length > 0 ? (
-        <div className="popular-scroll">
-          {popular.map((trip) => (
-            <div key={trip.id}>
-              <TripCard trip={trip} />
+      <div className="popular-scroll">
+        {popular.map((trip) => (
+          <div key={trip.id} style={{ minWidth: 240 }}>
+            <TripCard trip={trip} />
+          </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="empty-state">No popular trips.</div>
-      )}
-    </div>
-  );
-};
+          </div>
+        );
+      };
 
 export default Home;
