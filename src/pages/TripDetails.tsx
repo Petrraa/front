@@ -6,21 +6,6 @@ import { useAuth } from "../context/AuthContext";
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60";
 
-// ✅ EMOJI MAPA ZA ITINERARY
-const typeEmoji = (type: string) => {
-  switch (type) {
-    case "food":
-      return "🍽️";
-    case "hotel":
-      return "🏨";
-    case "transport":
-      return "🚗";
-    case "activity":
-    default:
-      return "📍";
-  }
-};
-
 const TripDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

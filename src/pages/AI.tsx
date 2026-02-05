@@ -135,6 +135,46 @@ const AI = () => {
             <option value="party">Party</option>
           </select>
 
+          <label className="form-label">Interests</label>
+          <div className="mb-3">
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="likesFood"
+                checked={likesFood}
+                onChange={(e) => setLikesFood(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="likesFood">
+                Food & Dining
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="likesNature"
+                checked={likesNature}
+                onChange={(e) => setLikesNature(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="likesNature">
+                Nature & Outdoors
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="likesNightlife"
+                checked={likesNightlife}
+                onChange={(e) => setLikesNightlife(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="likesNightlife">
+                Nightlife
+              </label>
+            </div>
+          </div>
+
           <button
             className="btn btn-primary tc-pill w-100"
             onClick={handleGenerate}
