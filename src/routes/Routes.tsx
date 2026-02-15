@@ -12,7 +12,9 @@ import Profile from "../pages/Profile";
 import AI from "../pages/AI";
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return null;
 
   return (
     <Routes>
